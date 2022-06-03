@@ -28,9 +28,9 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please Enter Phone Number"],
     unique: true,
   },
-  otpVerification: {
-    type: Boolean,
-    default: false,
+  verificationStatus: {
+    phone: { type: Boolean },
+    email: { type: Boolean },
   },
   avatar: {
     public_id: {
@@ -42,8 +42,8 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
+    enum: ["user", "docter", "admin"],
     default: "user",
-    
   },
   createdAt: {
     type: Date,

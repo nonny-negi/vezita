@@ -18,7 +18,7 @@ exports.upload = multer({ storage: storage });
 exports.singleFileHandler = (file, req) => {
   const url = `${req.protocol}://${req.get(
     "host"
-  )}/sanatanSetu/directory/images`;
+  )}/directory/images`;
 
   let imagesLink = {
     public_id: file,
@@ -31,7 +31,7 @@ exports.singleFileHandler = (file, req) => {
 exports.multipleImageHandler = async (file, req) => {
   const url = `${req.protocol}://${req.get(
     "host"
-  )}/sanatanSetu/directory/images`;
+  )}/directory/images`;
 
   const imagesLink = [];
   // console.log(file);
