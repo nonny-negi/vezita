@@ -4,7 +4,6 @@ const User = require("../models/userModel");
 const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
-const cloudinary = require("cloudinary");
 
 //google auth user
 
@@ -235,10 +234,6 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
       new ErrorHander(`User does not exist with Id: ${req.params.id}`, 400)
     );
   }
-
-  const imageId = user.avatar.public_id;
-
-  await cloudinary.v2.uploader.destroy(imageId);
 
   await user.remove();
 
