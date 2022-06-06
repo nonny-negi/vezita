@@ -226,25 +226,6 @@ exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// update User Role -- Admin
-exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
-  const newUserData = {
-    name: req.body.name,
-    email: req.body.email,
-    role: req.body.role,
-  };
-
-  await User.findByIdAndUpdate(req.params.id, newUserData, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  });
-
-  res.status(200).json({
-    success: true,
-  });
-});
-
 // Delete User --Admin
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.params.id);
@@ -264,29 +245,5 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "User Deleted Successfully",
-  });
-});
-
-exports.duplicateEmailCheck = catchAsyncErrors(async (req, res, next) => {
-  const isEmail = await User.aggregate([
-    {
-      $match: {
-        email: {
-          $regex: req.query.email,
-          $options: "i",
-        },
-      },
-    },
-    {
-      $project: {
-        email: 1,
-      },
-    },
-  ]);
-  if (isEmail?.length === 0)
-    res.status(200).json({ success: true, message: "Email Available" });
-  res.status(200).json({
-    success: false,
-    message: "Email already register !",
   });
 });
