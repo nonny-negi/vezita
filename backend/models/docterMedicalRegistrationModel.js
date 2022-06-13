@@ -1,0 +1,26 @@
+const mongoose = require("mongoose");
+
+const docterMedicalRegistrationSchema = new mongoose.Schema({
+  registrationNumber: {
+    type: String,
+    required: true,
+  },
+  councilName: {
+    type: String,
+    required: true,
+  },
+  year: {
+    type: Number,
+    required: true,
+  },
+  docter: {
+    type: mongoose.Types.ObjectId,
+    ref: "Docter",
+    required: true,
+  },
+});
+
+module.exports = mongoose.model(
+  "DocterMedicalRegistration",
+  docterMedicalRegistrationSchema
+);

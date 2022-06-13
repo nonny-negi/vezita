@@ -6,7 +6,6 @@ const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 
 //google auth user
-
 exports.googleAuth = catchAsyncErrors(async (req, res, next) => {
   const { token } = req.body;
   const ticket = await googleClient.verifyIdToken({
@@ -28,12 +27,24 @@ exports.googleAuth = catchAsyncErrors(async (req, res, next) => {
 
 // Register a User
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-  const { name, email, password, role, phone } = req.body;
+  const { name, email, password, phone } = req.body;
   const user = await User.create({
     name,
     email,
     password,
-    role,
+    phone,
+  });
+  sendToken(user, 201, res);
+});
+
+//register a Docter
+exports.registerDocter = catchAsyncErrors(async (req, res, next) => {
+  const { name, email, password, phone } = req.body;
+  const user = await User.create({
+    name,
+    email,
+    password,
+    role: "docter",
     phone,
   });
   sendToken(user, 201, res);
@@ -117,7 +128,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
 // Reset Password
 exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
-  // creating token hash
+
   const resetPasswordToken = crypto
     .createHash("sha256")
     .update(req.params.token)

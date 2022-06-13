@@ -3,9 +3,12 @@ const mongoose = require("mongoose");
 const docterQualificationSchema = new mongoose.Schema({
   degree: {
     type: String,
+    required: true, //
+    unique: true,
   },
   institute: {
     type: String,
+    required:true
   },
   year: {
     type: Date,
@@ -13,9 +16,14 @@ const docterQualificationSchema = new mongoose.Schema({
   experience: {
     type: Number,
   },
-  docterId: {
+  status: {
+    type: Boolean,
+    default: false,
+  },
+  docter: {
     type: mongoose.Types.ObjectId,
     ref: "Docter",
+    required:true
   },
 });
 

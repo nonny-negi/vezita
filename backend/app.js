@@ -23,8 +23,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Route Imports
 const user = require("./routes/userRoute");
+const docter = require("./routes/docterRoute")
 
+
+//route middleware
 app.use("/api/v1/user", user);
+app.use("/api/v1/docter",docter);
 
 // Middleware for Errors
 app.use(errorMiddleware);

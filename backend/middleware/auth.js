@@ -2,6 +2,7 @@ const ErrorHander = require("../utils/errorhander");
 const catchAsyncErrors = require("./catchAsyncErrors");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
+const Docter = require("../models/docterModel");
 
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   const { token } = req.cookies;
@@ -20,7 +21,7 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.authorizeRoles = (...roles) => {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(
         new ErrorHander(
@@ -29,7 +30,7 @@ exports.authorizeRoles = (...roles) => {
         )
       );
     }
-
+    req.docter = await Docter.findOne({ user: req.user._id });
     next();
   };
 };

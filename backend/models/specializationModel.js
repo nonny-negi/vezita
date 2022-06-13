@@ -8,4 +8,4 @@ const specializationSchema = new mongoose.Schema({
   },
 });
 
-exports.module = mongoose.model("Specialization", specializationSchema);
+module.exports = mongoose.model("Specialization", specializationSchema);

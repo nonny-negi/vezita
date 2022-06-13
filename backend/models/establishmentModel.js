@@ -7,7 +7,7 @@ const establishmentSchema = mongoose.Schema({
   }, //
   type: {
     type: String, //
-    enum: [],
+    enum: ["own", "visit"],
     required: true,
   },
   contactNumber: {
@@ -21,6 +21,10 @@ const establishmentSchema = mongoose.Schema({
       url: String, //
     },
   ],
+  status: {
+    type: Boolean, //
+    default: false,
+  },
   docter: {
     type: mongoose.Types.ObjectId,
     ref: "Docter",
@@ -28,4 +32,4 @@ const establishmentSchema = mongoose.Schema({
   },
 });
 
-exports.module = mongoose.model("Establishment", establishmentSchema);
+module.exports = mongoose.model("Establishment", establishmentSchema);

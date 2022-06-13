@@ -29,8 +29,14 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   verificationStatus: {
-    phone: { type: Boolean },
-    email: { type: Boolean },
+    phone: {
+      type: Boolean,
+      default: false,
+    },
+    email: {
+      type: Boolean,
+      default: false,
+    },
   },
   avatar: {
     public_id: {
@@ -76,10 +82,8 @@ userSchema.methods.comparePassword = async function (password) {
 
 // Generating Password Reset Token
 userSchema.methods.getResetPasswordToken = function () {
-  // Generating Token
   const resetToken = crypto.randomBytes(20).toString("hex");
 
-  // Hashing and adding resetPasswordToken to userSchema
   this.resetPasswordToken = crypto
     .createHash("sha256")
     .update(resetToken)

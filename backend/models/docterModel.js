@@ -19,9 +19,18 @@ const docterSchema = new mongoose.Schema({
     required: true,
   },
   totalExperiences: {
-    type: String,
+    type: Number,
     required: true,
+  },
+  status: {
+    type: String,
+    enum: ["active", "pending", "inactive"],
+    default: "pending",
+  },
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: "User",
   },
 });
 
-exports.module = mongoose.model("Docter", docterSchema);
+module.exports = mongoose.model("Docter", docterSchema);
