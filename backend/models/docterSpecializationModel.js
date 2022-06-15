@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const docterSpecializationSchema = new mongoose.Schema({
-  docterId: {
+  docter: {
     type: mongoose.Types.ObjectId,
     ref: "Docter",
   },
@@ -11,7 +11,7 @@ const docterSpecializationSchema = new mongoose.Schema({
   },
 });
 
-exports.module = mongoose.model(
+module.exports = mongoose.model(
   "DocterSpecialization",
   docterSpecializationSchema
 );

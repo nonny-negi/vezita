@@ -1,13 +1,14 @@
 const ErrorHander = require("../utils/errorhander");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-const sendToken = require("../utils/jwtToken");
-const sendEmail = require("../utils/sendEmail");
 
 const DocterQualification = require("../models/docterQualificationModel");
 const Establishment = require("../models/establishmentModel");
 const DocterMedicalRegistration = require("../models/docterMedicalRegistrationModel");
 const Docter = require("../models/docterModel");
 
+const mongoose = require("mongoose");
+
+// New Profile (Docter)
 exports.docterProfile = catchAsyncErrors(async (req, res, next) => {
   const { basicDetails, medicalRegistration, educationDetails, establishment } =
     req.body;
@@ -43,7 +44,8 @@ exports.docterProfile = catchAsyncErrors(async (req, res, next) => {
     .json({ docter, medicalDetails, establishmentDetails, education });
 });
 
-exports.getDocterProfiles = catchAsyncErrors(async (req, res, next) => {
+//Admin
+exports.getAllDocterProfile = catchAsyncErrors(async (req, res, next) => {
   const docters = await Docter.aggregate([
     {
       $lookup: {
@@ -69,10 +71,163 @@ exports.getDocterProfiles = catchAsyncErrors(async (req, res, next) => {
         as: "medical-registration-details",
       },
     },
+    {
+      $lookup: {
+        from: "docterspecializations",
+        localField: "_id",
+        foreignField: "docter",
+        pipeline: [
+          {
+            $lookup: {
+              from: "specializations",
+              localField: "specializationId",
+              foreignField: "_id",
+              as: "sp",
+            },
+          },
+          {
+            $unwind: "$sp",
+          },
+          {
+            $project: {
+              specialization: "$sp.name",
+              icon: "$sp.icon.url",
+              _id: 0,
+            },
+          },
+        ],
+        as: "specialization",
+      },
+    },
   ]);
   res.status(200).json({ docters });
 });
 
+//My Profile (Docter)
+exports.getMyProfile = catchAsyncErrors(async (req, res, next) => {
+  const docter = await Docter.aggregate([
+    {
+      $match: { _id: req.docter._id },
+    },
+    {
+      $lookup: {
+        from: "docterqualifications",
+        localField: "_id",
+        foreignField: "docter",
+        as: "education",
+      },
+    },
+    {
+      $lookup: {
+        from: "establishments",
+        localField: "_id",
+        foreignField: "docter",
+        as: "establishment",
+      },
+    },
+    {
+      $lookup: {
+        from: "doctermedicalregistrations",
+        localField: "_id",
+        foreignField: "docter",
+        as: "medical-registration-details",
+      },
+    },
+    {
+      $lookup: {
+        from: "docterspecializations",
+        localField: "_id",
+        foreignField: "docter",
+        pipeline: [
+          {
+            $lookup: {
+              from: "specializations",
+              localField: "specializationId",
+              foreignField: "_id",
+              as: "sp",
+            },
+          },
+          {
+            $unwind: "$sp",
+          },
+          {
+            $project: {
+              specialization: "$sp.name",
+              icon: "$sp.icon.url",
+              _id: 0,
+            },
+          },
+        ],
+        as: "specialization",
+      },
+    },
+  ]);
+  res.status(200).json(docter[0]);
+});
+
+//Get Docter's Profile (customer)
+exports.getDocterProfileById = catchAsyncErrors(async (req, res, next) => {
+  const docter = await Docter.aggregate([
+    {
+      $match: { _id: mongoose.Types.ObjectId(req.params.id) },
+    },
+    {
+      $lookup: {
+        from: "docterqualifications",
+        localField: "_id",
+        foreignField: "docter",
+        as: "education",
+      },
+    },
+    {
+      $lookup: {
+        from: "establishments",
+        localField: "_id",
+        foreignField: "docter",
+        as: "establishment",
+      },
+    },
+    {
+      $lookup: {
+        from: "doctermedicalregistrations",
+        localField: "_id",
+        foreignField: "docter",
+        as: "medical-registration-details",
+      },
+    },
+    {
+      $lookup: {
+        from: "docterspecializations",
+        localField: "_id",
+        foreignField: "docter",
+        pipeline: [
+          {
+            $lookup: {
+              from: "specializations",
+              localField: "specializationId",
+              foreignField: "_id",
+              as: "sp",
+            },
+          },
+          {
+            $unwind: "$sp",
+          },
+          {
+            $project: {
+              specialization: "$sp.name",
+              icon: "$sp.icon.url",
+              _id: 0,
+            },
+          },
+        ],
+        as: "specialization",
+      },
+    },
+  ]);
+  res.status(200).json(docter[0]);
+});
+
+//Add Education (Docter)
 exports.addEducation = catchAsyncErrors(async (req, res, next) => {
   const { qualification } = req.body;
   qualification.forEach(async (item) => {
@@ -80,3 +235,11 @@ exports.addEducation = catchAsyncErrors(async (req, res, next) => {
   });
   res.status(201).json({ msg: "success" });
 });
+
+//Add Establishment
+exports.addEstablishment = catchAsyncErrors(async (req, res, next) => {});
+
+//Add Medical Details
+exports.addDocterMedicalRegistrationDetails = catchAsyncErrors(
+  async (req, res, next) => {}
+);

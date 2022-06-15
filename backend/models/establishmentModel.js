@@ -5,7 +5,7 @@ const establishmentSchema = mongoose.Schema({
     type: String,
     required: true,
   }, //
-  type: {
+  establishmentType: {
     type: String, //
     enum: ["own", "visit"],
     required: true,
@@ -24,6 +24,12 @@ const establishmentSchema = mongoose.Schema({
   status: {
     type: Boolean, //
     default: false,
+  },
+  address: {
+    type: String,
+  },
+  city: {
+    type: String,
   },
   docter: {
     type: mongoose.Types.ObjectId,

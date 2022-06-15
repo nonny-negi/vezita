@@ -12,7 +12,16 @@ module.exports = (err, req, res, next) => {
 
   // Mongoose duplicate key error
   if (err.code === 11000) {
-    const message = `Duplicate ${Object.keys(err.keyValue)} Entered`;
+
+    var message;
+    if (Object.keys(err.keyValue) == "email") {
+       message = `An account with that ${Object.keys(
+        err.keyValue
+      )} already exists.`;
+    } else {
+       message = `${Object.keys(err.keyValue)} already exists.`;
+    }
+
     err = new ErrorHandler(message, 400);
   }
 
@@ -26,6 +35,14 @@ module.exports = (err, req, res, next) => {
   if (err.name === "TokenExpiredError") {
     const message = `Json Web Token is Expired, Try again `;
     err = new ErrorHandler(message, 400);
+  }
+
+  if (
+    err.message ===
+    "Argument passed in must be a single String of 12 bytes or a string of 24 hex characters"
+  ) {
+    const message = `Invalid ObjectId Passed`;
+    err = new ErrorHandler(message, 500);
   }
 
   res.status(err.statusCode).json({

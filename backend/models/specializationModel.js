@@ -3,8 +3,14 @@ const mongoose = require("mongoose");
 const specializationSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: true,
+    required: [true, "Please Enter Your Email"],
     unique: true,
+  },
+  icon: {
+    url: {
+      type: String,
+      default: "https://cdn-icons-png.flaticon.com/512/2317/2317929.png",
+    },
   },
 });
 
