@@ -38,6 +38,15 @@ const userSchema = new mongoose.Schema({
       default: false,
     },
   },
+  firebaseUid:{
+    type:String,
+    required:true,
+    unique:true
+  },
+  firebaseSignInProvider:{
+    type:String,
+    required:true
+  },
   avatar: {
     public_id: {
       type: String,
