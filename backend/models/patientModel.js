@@ -44,6 +44,10 @@ const patientSchema = new mongoose.Schema({
     public_id: { type: String },
     url: { type: String },
   },
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: "User",
+  },
 });
 
 exports.module = mongoose.model("Patient", patientSchema);
