@@ -10,8 +10,7 @@ const ServiceAvailability = require("../models/serviceAvailability");
 const {sendNotification} = require("../utils/notification");
 const Patient = require("../models/patientModel");
 const Doctor = require("../models/docterModel");
-// const SendEmail = require("../utils/sendEmail");
-// const {sendOrderEmail} = require("../utils/sendEmail");
+const {sendOrderEmail} = require("../utils/sendEmail");
 // const doctorEarning = require("../models/doctorEarning");
 
 
@@ -106,31 +105,21 @@ exports.createBooking = catchAsyncErrors(async(req,res) =>{
 
 
             // send email to doctor for accepting and declining
-            // sendOrderEmail(
-            //     "bookingOrder",
-            //     Doctor.email,
-            //     patientObj.name,
-            //     patientObj.image,
-            //     service.name,
-            //     sDate,
-            //     timeFrom,
-            //     timeTo,
-            //     Doctor.fullName,
-            //     booking.totalAmount,
-            //     "Booking Confirmation",
-            //     acceptUrl,
-            //     declineUrl
-            // )
-
-        // await sendNotification(
-        //     "test",
-        //     booking.bookedBy,
-        //     "Your booking has been created.",
-        //     "Your booking need to accepted by doctor",
-        //     "booking",
-        //     booking._id
-
-        // )
+            sendOrderEmail(
+                "bookingOrder",
+                doctor.email,
+                patientObj.name,
+                patientObj.image,
+                service.name,
+                sDate,
+                timeFrom,
+                timeTo,
+                Doctor.fullName,
+                booking.totalAmount,
+                "Booking Confirmation",
+                acceptUrl,
+                declineUrl
+            )
 
         res.status(200).json({
             status:true,
@@ -527,19 +516,19 @@ exports.updateBookingStatus = catchAsyncErrors( async(req,res) =>{
                 let timeFrom = new Date(found[0].availableFrom).toLocaleTimeString()
                 let timeTo = new Date(found[0].availableTo).toLocaleTimeString()
 
-                // sendOrderEmail(
-                //     "orderCompletedEmail",
-                //     doctor.email,
-                //     patient.name,
-                //     patient.image,
-                //     service.name,
-                //     sDate,
-                //     timeFrom,
-                //     timeTo,
-                //     doctor.fullName,
-                //     booking.totalAmount,
-                //     "Booking Invoice"
-                // )
+                sendOrderEmail(
+                    "orderCompletedEmail",
+                    doctor.email,
+                    patient.name,
+                    patient.image,
+                    service.name,
+                    sDate,
+                    timeFrom,
+                    timeTo,
+                    doctor.fullName,
+                    booking.totalAmount,
+                    "Booking Invoice"
+                )
             }
             updateBooking.displayMessage2="Your Session has been completed."
             await updateBooking.save()

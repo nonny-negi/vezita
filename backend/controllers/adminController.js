@@ -1,3 +1,5 @@
+const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+
 const User = require("../models/user");
 const Doctor = require("../models/docterModel");
 const DocterQualification = require("../models/docterQualificationModel");
@@ -6,7 +8,7 @@ const DocterMedicalRegistration = require("../models/docterMedicalRegistrationMo
 const APIFeatures = require("../utils/apiFeatures");
 
 // Get all users
-exports.getAllUser = async(req,res) =>{
+exports.getAllUser = catchAsyncErrors( async(req,res) =>{
 
         // let users = await User.find({});
         let users;
@@ -45,10 +47,10 @@ exports.getAllUser = async(req,res) =>{
             msg:err.message
         })
   
-}
+});
 
 //get all detail for user
-exports.getUser = async(req,res) =>{
+exports.getUser = catchAsyncErrors( async(req,res) =>{
 
         let user = await User.findById(req.params.userId);
         if(!user){
@@ -67,10 +69,10 @@ exports.getUser = async(req,res) =>{
             msg:err.message
         })
 
-}
+});
 
 //block user
-exports.blockUser = async(req,res) =>{
+exports.blockUser = catchAsyncErrors( async(req,res) =>{
 
         let user = await User.findById(req.params.userId);
         if(!user){
@@ -91,11 +93,11 @@ exports.blockUser = async(req,res) =>{
             msg:err.message
         })
 
-}
+});
 
 
 // Get all doctors
-exports.getAlldoctor = async(req,res) =>{
+exports.getAlldoctor = catchAsyncErrors( async(req,res) =>{
         // let doctors = await doctor.find({});
 
         let doctors;
@@ -132,11 +134,11 @@ exports.getAlldoctor = async(req,res) =>{
             status:false,
             msg:err.message
         })
-}
+});
 
 
 //get all detail for user
-exports.getdoctor = async(req,res) =>{
+exports.getdoctor = catchAsyncErrors( async(req,res) =>{
 
         let doctor = await Doctor.findById(req.params.doctorId)
             .populate("DocterQualification")
@@ -157,11 +159,11 @@ exports.getdoctor = async(req,res) =>{
             msg:err.message
         })
 
-}
+});
 
 
 //block user
-exports.blockdoctor = async(req,res) =>{
+exports.blockdoctor = catchAsyncErrors( async(req,res) =>{
 
         let doctor = await Doctor.findById(req.params.doctorId);
         if(!doctor){
@@ -182,10 +184,10 @@ exports.blockdoctor = async(req,res) =>{
             msg:err.message
         })
 
-}
+});
 
 //verify qualification certificate
-exports.verifyQualiCertificate = async(req,res) =>{
+exports.verifyQualiCertificate = catchAsyncErrors( async(req,res) =>{
 
         let verifyQualiCertificate = await DocterQualification.findByIdAndUpdate(req.params.qualificationId,{status:true},{new:true});
         res.status(200).json({
@@ -198,10 +200,10 @@ exports.verifyQualiCertificate = async(req,res) =>{
             msg:err.message
         })
 
-}
+});
 
 //verify medicalRegistration certificate
-exports.verifyMedicalRegCertificate = async(req,res) =>{
+exports.verifyMedicalRegCertificate = catchAsyncErrors( async(req,res) =>{
 
     let verifyMedicalRegCertificate = await DocterMedicalRegistration.findByIdAndUpdate(req.params.medicalRegistrationId,{new:true});
     res.status(200).json({
@@ -214,4 +216,4 @@ exports.verifyMedicalRegCertificate = async(req,res) =>{
         msg:err.message
     })
 
-}
+});

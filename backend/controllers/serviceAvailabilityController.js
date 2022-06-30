@@ -1,13 +1,16 @@
+const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+
 const ServiceAvailability = require("../models/serviceAvailability");
-const doctorService = require("../models/doctorServicesModel");
+
+const DoctorService = require("../models/docterServiceModel");
 const APIFeatures = require("../utils/apiFeatures");
 
 //add availability
-exports.addServiceAvailability = async(req,res) =>{
-    try{
+exports.addServiceAvailability = catchAsyncErrors( async(req,res) =>{
+
         let serviceId = req.params.serviceId
         
-        let service = await doctorService.findById(serviceId);
+        let service = await DoctorService.findById(serviceId);
         if(!service){
             return res.status(404).json({
                 status:false,
@@ -15,7 +18,7 @@ exports.addServiceAvailability = async(req,res) =>{
             })
         }
 
-        if(JSON.stringify(service.vendor) !== JSON.stringify(req.vendor._id)){
+        if(JSON.stringify(service.Doctor) !== JSON.stringify(req.Doctor._id)){
             return res.status(400).json({
                 status:false,
                 msg:"Only Service Owner can add availability"
@@ -71,18 +74,15 @@ exports.addServiceAvailability = async(req,res) =>{
             })
         }
 
-    }catch(err){
-        console.log(err)
         return res.status(500).json({
             status:false,
             msg:err.message
         })
-    }
-}
+});
 
 //get all availability of a single service
-exports.getAllAvailability = async(req,res) =>{
-    try{
+exports.getAllAvailability = catchAsyncErrors( async(req,res) =>{
+
         let serviceId = req.params.serviceId;
         console.log(req.query)
         let availability = new APIFeatures(ServiceAvailability.find({service:serviceId}),req.query).advanceFilter();
@@ -94,23 +94,21 @@ exports.getAllAvailability = async(req,res) =>{
             availability:doc
         })
 
-    }catch(err){
-        console.log(err)
         return res.status(500).json({
             status:false,
             msg:err.message
         })
-    }
-}
+  
+});
 
 
 //update availability
-exports.updateAvailabilityStatus = async(req,res) =>{
-    try{
+exports.updateAvailabilityStatus = catchAsyncErrors( async(req,res) =>{
+
         let availabilityId = req.params.availabilityId;
 
         let serviceId = req.params.serviceId;
-        let service = await doctorService.findById(serviceId);
+        let service = await DoctorService.findById(serviceId);
         if(!service){
             return res.status(404).json({
                 status:false,
@@ -125,23 +123,21 @@ exports.updateAvailabilityStatus = async(req,res) =>{
             availability:availabilityUpdate
         })
         
-    }catch(err){
-        console.log(err)
         return res.status(500).json({
             status:false,
             msg:err.message
         })
-    }
-}
+    
+});
 
 
 // add extra or remove availability
-exports.udpateAvailability = async(req,res) =>{
-    try{
+exports.udpateAvailability = catchAsyncErrors( async(req,res) =>{
+
         const {type} = req.body;
         let availabilityId = req.params.availabilityId;
         let serviceId = req.params.serviceId;
-        let service = await doctorService.findById(serviceId);
+        let service = await DoctorService.findById(serviceId);
         if(!service){
             return res.status(404).json({
                 status:false,
@@ -218,11 +214,10 @@ exports.udpateAvailability = async(req,res) =>{
             status:true,
             availability
         })
-    }catch(err){
-        console.log(err)
+
         return res.status(500).json({
             status:false,
             msg:err.message
         })
-    }
-}
+    
+});
