@@ -20,6 +20,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.5",
     "nodemailer": "^6.7.5",
+    "stripe": "^9.8.0",
     "validator": "^13.6.0"
   }
 }
