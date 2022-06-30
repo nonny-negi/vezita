@@ -117,3 +117,4 @@ exports.getUserPatients = catchAsyncErrors(async (req, res, next) => {
     patient,
   });
 });
+

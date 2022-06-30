@@ -19,7 +19,9 @@ const docterMedicalRegistrationSchema = new mongoose.Schema({
     ref: "Docter",
     required: true,
   },
-});
+},
+  {timestamps:true}
+);
 
 module.exports = mongoose.model(
   "DocterMedicalRegistration",

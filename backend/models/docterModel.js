@@ -45,6 +45,24 @@ const docterSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: "User",
   },
+},
+{
+  timestamps:true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+}
+);
+
+vendorUserSchema.virtual('DocterMedicalRegistration', {
+  ref: 'DocterMedicalRegistration',
+  localField: '_id',
+  foreignField: 'docter'
+});
+
+vendorUserSchema.virtual('DocterQualification', {
+  ref: 'DocterQualification',
+  localField: '_id',
+  foreignField: 'docter'
 });
 
 module.exports = mongoose.model("Docter", docterSchema);
