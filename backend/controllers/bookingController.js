@@ -2,16 +2,16 @@ const ErrorHander = require("../utils/errorhander");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 
 const Booking = require("../models/bookingModel");
-const doctorService = require("../models/doctorServiceModel");
+const DoctorService = require("../models/docterServiceModel");
 const mongoose = require("mongoose");
 const APIFeatures = require("../utils/apiFeatures");
 const Session = require("../models/sessionModel");
 const ServiceAvailability = require("../models/serviceAvailability");
 const {sendNotification} = require("../utils/notification");
 const Patient = require("../models/patientModel");
-// const doctor = require("../models/doctorModel");
+const Doctor = require("../models/docterModel");
 // const SendEmail = require("../utils/sendEmail");
-const {sendOrderEmail} = require("../utils/sendEmail");
+// const {sendOrderEmail} = require("../utils/sendEmail");
 // const doctorEarning = require("../models/doctorEarning");
 
 
@@ -45,7 +45,7 @@ exports.createBooking = catchAsyncErrors(async(req,res) =>{
                 msg:"Please pass in clinic appointment."
             })
         }
-
+ 
         if(bookingType==="video" && !doctorId){
             return res.status(400).json({
                 status:false,
@@ -66,13 +66,13 @@ exports.createBooking = catchAsyncErrors(async(req,res) =>{
 
         // console.log(booking.patient)
         let patientObj = await Patient.findById(booking.patient)
-        let service = await doctorService.findById(booking.service);
+        let service = await DoctorService.findById(booking.service);
         let serviceAvailability = await ServiceAvailability.findById(booking.serviceAvailability);
 
         let found = serviceAvailability.fixedPriceAvailability.filter(
             (serviceAvailId) => JSON.stringify(serviceAvailId._id)==JSON.stringify(booking.availabilityId)
         );
-        let doctor = await doctor.findById(service.doctor);
+        let doctor = await Doctor.findById(service.doctor);
         if(booking.status==="pending"){
             //for customer app
             await sendNotification(
@@ -108,14 +108,14 @@ exports.createBooking = catchAsyncErrors(async(req,res) =>{
             // send email to doctor for accepting and declining
             // sendOrderEmail(
             //     "bookingOrder",
-            //     doctor.email,
+            //     Doctor.email,
             //     patientObj.name,
             //     patientObj.image,
             //     service.name,
             //     sDate,
             //     timeFrom,
             //     timeTo,
-            //     doctor.fullName,
+            //     Doctor.fullName,
             //     booking.totalAmount,
             //     "Booking Confirmation",
             //     acceptUrl,
@@ -152,7 +152,7 @@ exports.getBooking = catchAsyncErrors(async(req,res) =>{
         let bookedBy = req.user._id;
         req.query.bookedBy = bookedBy
 
-        if(req.query.status==="upcoming"){
+        if(req.query.st.atus==="upcoming"){
             bookedBy = mongoose.Types.ObjectId(bookedBy);
             let serviceDate = new Date()
             console.log(serviceDate)
@@ -324,7 +324,7 @@ exports.getBookingFordoctor = async(req,res) =>{
                     "foreignField":"_id",
                     "as":"serviceAvailability"
                 }
-            },
+            },        
             {
                 "$lookup":{
                     "from":"User",
@@ -461,10 +461,7 @@ exports.updateBookingStatus = catchAsyncErrors( async(req,res) =>{
             let sessionDurationTimestamp = (found[0].availableTo-found[0].availableFrom)/1000
             console.log(sessionDurationTimestamp)
             
-            // let h = Math.floor(sessionDurationTimestamp/3600);
-            // let m = Math.floor(sessionDurationTimestamp%3600/60);
-            // let s = Math.floor(sessionDurationTimestamp%3600%60);
-            
+           
             let checkSession = await Session.findOne({booking:booking._id})
             if(!checkSession){
                 let createSession = await Session.create({
@@ -478,7 +475,7 @@ exports.updateBookingStatus = catchAsyncErrors( async(req,res) =>{
         let updateBooking = await Booking.findByIdAndUpdate(bookingId,req.body,{new:true});
 
         let patient = await Patient.findById(updateBooking.patient);
-        let doctor = await doctor.findById(service.doctor);
+        let doctor = await Doctor.findById(service.doctor);
 
         if(updateBooking.status==='confirmed'){
           
@@ -529,17 +526,6 @@ exports.updateBookingStatus = catchAsyncErrors( async(req,res) =>{
                 let sDate = formatDate(serviceAvailability.serviceDate);
                 let timeFrom = new Date(found[0].availableFrom).toLocaleTimeString()
                 let timeTo = new Date(found[0].availableTo).toLocaleTimeString()
-
-                // let checkdoctorEarning = await doctorEarning.findOne({doctor:doctor._id});
-                // if(!checkdoctorEarning){
-                //     await doctorEarning.create({
-                //         doctor:doctor._id,
-                //         pendingEarningByAdmin:updateBooking.totalAmount,
-                //     })
-                // }
-
-                // checkdoctorEarning.pendingEarningByAdmin = checkdoctorEarning.pendingEarningByAdmin + updateBooking.totalAmount
-                // await checkdoctorEarning.save();
 
                 // sendOrderEmail(
                 //     "orderCompletedEmail",
@@ -678,15 +664,15 @@ exports.declineOrderByDoctor = catchAsyncErrors( async(req,res) =>{
 
         let patient = await Patient.findById(findBooking.patient);
         let service =  await doctorService.findById(findBooking.service);
-        let doctor = await doctor.findById(service.doctor);
+        let doctor = await Doctor.findById(service.doctor);
 
         if(findBooking.status=="cancelled"){
             //for customer app
             await sendNotification(
                 findBooking.bookedBy.toString(),
                 findBooking.bookedBy,
-                `Your Booking for ${patient.name} with ${doctor.fullName}is cancelled.`,
-                `Your Booking for ${patient.name} with ${doctor.fullName}is cancelled.`,
+                `Your Booking for ${patient.name} with ${doctor.fullName} is cancelled.`,
+                `Your Booking for ${patient.name} with ${doctor.fullName} is cancelled.`,
                 "booking",
                 findBooking._id
     
