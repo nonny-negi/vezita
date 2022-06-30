@@ -1,6 +1,7 @@
 const User = require("../models/user");
-const doctor = require("../models/doctorUser");
-const {AddressProof,PoliceCertificate,QualificationCertificate} = require("../models/doctorDocument");
+const Doctor = require("../models/docterModel");
+const DocterQualification = require("../models/docterQualificationModel");
+const DocterMedicalRegistration = require("../models/docterMedicalRegistrationModel");
 
 const APIFeatures = require("../utils/apiFeatures");
 
@@ -101,12 +102,11 @@ exports.getAlldoctor = async(req,res) =>{
         let search = req.query.search;
         if(search){
             let regex = new RegExp([search].join(""), "i");
-            doctors = await doctor.aggregate([
+            doctors = await Doctor.aggregate([
                 {
                     "$match": {
                         "$or":[
-                            {"firstName":{"$regex":regex}},
-                            {"lastName":{"$regex":regex}}
+                            {"fullName":{"$regex":regex}}
                         ]
                     }
                 }
@@ -119,7 +119,7 @@ exports.getAlldoctor = async(req,res) =>{
             })
         }
 
-        doctors = new APIFeatures(doctor.find(),req.query).filter();
+        doctors = new APIFeatures(Doctor.find(),req.query).filter();
         const doc = await doctors.query;
 
         res.status(200).json({
@@ -138,9 +138,9 @@ exports.getAlldoctor = async(req,res) =>{
 //get all detail for user
 exports.getdoctor = async(req,res) =>{
 
-        let doctor = await doctor.findById(req.params.doctorId).populate("addressProof")
-            .populate("policeCertificate")
-            .populate("qualificationCertificate");
+        let doctor = await Doctor.findById(req.params.doctorId)
+            .populate("DocterQualification")
+            .populate("DocterMedicalRegistration");
         if(!doctor){
             return res.status(404).json({
                 status:false,
@@ -163,14 +163,14 @@ exports.getdoctor = async(req,res) =>{
 //block user
 exports.blockdoctor = async(req,res) =>{
 
-        let doctor = await doctor.findById(req.params.doctorId);
+        let doctor = await Doctor.findById(req.params.doctorId);
         if(!doctor){
             return res.status(404).json({
                 status:false,
                 msg:"User not found."
             })
         }
-        let updateUser =  await doctor.findByIdAndUpdate(req.params.doctorId,req.body,{new:true});
+        let updateUser =  await Doctor.findByIdAndUpdate(req.params.doctorId,req.body,{new:true});
         res.status(200).json({
             status:true,
             msg:"You blocked doctor",
@@ -184,49 +184,34 @@ exports.blockdoctor = async(req,res) =>{
 
 }
 
-//verify address certificate
-exports.verifyAddress = async(req,res) =>{
-        let verifyAddress = await AddressProof.findByIdAndUpdate(req.params.addressProofId,{isVerified:true},{new:true});
-        res.status(200).json({
-            status:false,
-            addressProof:verifyAddress
-        })
-
-        return res.status(500).json({
-            status:false,
-            msg:err.message
-        })
-}
-
-
-//verify address certificate
-exports.verifyPoliceCertificate = async(req,res) =>{
-        let verifyPoliceCertificate = await PoliceCertificate.findByIdAndUpdate(req.params.policeCertificateId,{isVerified:true},{new:true});
-        res.status(200).json({
-            status:false,
-            policeCertificate:verifyPoliceCertificate
-        })
-
-        return res.status(500).json({
-            status:false,
-            msg:err.message
-        })
-
-}
-
-
-//verify address certificate
+//verify qualification certificate
 exports.verifyQualiCertificate = async(req,res) =>{
 
-        let verifyQualiCertificate = await QualificationCertificate.findByIdAndUpdate(req.params.qualificationId,{isVerified:true},{new:true});
+        let verifyQualiCertificate = await DocterQualification.findByIdAndUpdate(req.params.qualificationId,{status:true},{new:true});
         res.status(200).json({
             status:false,
-            qualificationCertificate:verifyQualiCertificate
+            DocterQualification:verifyQualiCertificate
         })
 
         return res.status(500).json({
             status:false,
             msg:err.message
         })
+
+}
+
+//verify medicalRegistration certificate
+exports.verifyQualiCertificate = async(req,res) =>{
+
+    let verifyMedicalRegCertificate = await DocterMedicalRegistration.findByIdAndUpdate(req.params.medicalRegistrationId,{new:true});
+    res.status(200).json({
+        status:false,
+        DocterMedicalRegistration:verifyMedicalRegCertificate
+    })
+
+    return res.status(500).json({
+        status:false,
+        msg:err.message
+    })
 
 }
