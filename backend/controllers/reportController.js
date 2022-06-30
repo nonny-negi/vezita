@@ -13,9 +13,8 @@ exports.addPatientReport = catchAsyncErrors(async (req, res, next) => {
 
   const data = {
     reportType: patientReport.reportType,
-    reportFor: patientReport.reportFor,
     diagonsedFor: patientReport.diagonsedFor,
-    report: req.file.key,
+    // report: req.file.key,
     patient: req.body.patient,
   };
 

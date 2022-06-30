@@ -18,15 +18,6 @@ const couponSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    minimumAmount: {
-      type: Number,
-      required: true,
-    },
-    user: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
   },
   {
     timestamps: true,

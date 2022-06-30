@@ -8,6 +8,7 @@ const {
   addEstablishment,
   addDocterExperience,
   addDocterMedicalRegistrationDetails,
+  getDocterBySpecialization,
 } = require("../controllers/docterController");
 
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
@@ -47,5 +48,7 @@ router
     authorizeRoles("docter"),
     addDocterMedicalRegistrationDetails
   );
+
+router.route("/search/docter-by-specialization/:id").get(getDocterBySpecialization);
 
 module.exports = router;

@@ -1,47 +1,71 @@
 const multer = require("multer");
-const path = require("path");
+const AWS = require("aws-sdk");
+const multerS3 = require("multer-s3");
+require("dotenv").config({ path: "backend/config/config.env" });
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, __dirname.split("backend")[0] + "/backend/public/uploads");
+const imageS3 = new AWS.S3({
+  accessKeyId: process.env.AWS_SECRET_KEY,
+  secretAccessKey: process.env.AWS_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+
+const storageAvatarS3 = multerS3({
+  s3: imageS3,
+  bucket: process.env.AWS_BUCKET,
+  acl: "public-read",
+  metadata(req, file, cb) {
+    cb(null, {
+      fieldName: file.fieldname,
+    });
   },
-  filename: (req, file, cb) => {
-    console.log("uploading file +++++++++++++++++++++++++++++++");
-    const newFileName =
-      file.originalname.trim() + Date.now() + path.extname(file.originalname);
-    cb(null, newFileName);
+  key(req, file, cb) {
+    cb(
+      null,
+      `user/avatar` +
+        file.fieldname +
+        "-" +
+        Date.now().toString() +
+        "." +
+        file.mimetype.split("/")[1]
+    );
   },
 });
 
-exports.upload = multer({ storage: storage });
-
-exports.singleFileHandler = (file, req) => {
-  const url = `${req.protocol}://${req.get(
-    "host"
-  )}/directory/images`;
-
-  let imagesLink = {
-    public_id: file,
-    url: `${url}/${file}`,
-  };
-
-  return imagesLink;
-};
-
-exports.multipleImageHandler = async (file, req) => {
-  const url = `${req.protocol}://${req.get(
-    "host"
-  )}/directory/images`;
-
-  const imagesLink = [];
-  // console.log(file);
-
-  for (let i = 0; i < file.length; i++) {
-    imagesLink.push({
-      public_id: file[i].filename,
-      url: `${url}/${file[i].filename}`,
+const storageBannerS3 = multerS3({
+  s3: imageS3,
+  bucket: "<S3_BUCKET_NAME>",
+  acl: "public-read",
+  metadata(req, file, cb) {
+    cb(null, {
+      fieldName: file.fieldname,
     });
-  }
+  },
+  key(req, file, cb) {
+    cb(
+      null,
+      `banner/` +
+        file.fieldname +
+        "-" +
+        Date.now().toString() +
+        "." +
+        file.mimetype.split("/")[1]
+    );
+  },
+});
 
-  return imagesLink;
+//Upload Avatar
+const uploadImage = multer({
+  limits: { fileSize: 10 * 1024 * 1024 },
+  storage: storageAvatarS3,
+});
+
+//Upload Banner
+const uploadBannerImage = multer({
+  limits: { fileSize: 10 * 1024 * 1024 },
+  storage: storageBannerS3,
+});
+
+module.exports = {
+  uploadImage,
+  uploadBannerImage,
 };

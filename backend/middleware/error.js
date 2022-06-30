@@ -45,19 +45,25 @@ module.exports = (err, req, res, next) => {
     err = new ErrorHandler(message, 500);
   }
 
-
-  // Validation Error 
+  // Validation Error
   if (err.name === "ValidationError") {
     let message = {};
+
     for (let key in err.errors) {
-      message[key] = err.errors[key].properties.message;
+      if (err.errors[key].name === "CastError") {
+        message[key] = `${err.errors[key]}`;
+      } else {
+        message[key] = err.errors[key].properties.message;
+      }
     }
-    res.status(err.statusCode).json({
+    err = new ErrorHandler(JSON.stringify(message), 500);
+
+    return res.status(err.statusCode).json({
       success: false,
       message: message,
     });
   }
-  
+
   res.status(err.statusCode).json({
     success: false,
     message: err.message,

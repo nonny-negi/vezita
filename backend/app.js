@@ -28,6 +28,10 @@ const review = require("./routes/reviewRoute");
 const service = require("./routes/serviceRoute");
 const coupon = require("./routes/couponRoute");
 const payment = require("./routes/paymentRoute");
+const patient = require("./routes/patientRoute");
+const report = require("./routes/reportRoute");
+const booking = require("./routes/bookingRoute");
+const package = require("./routes/packageRoute");
 
 //route middleware
 app.use("/api/v1/user", user);
@@ -36,6 +40,10 @@ app.use("/api/v1/review", review);
 app.use("/api/v1/service", service);
 app.use("/api/v1/coupon", coupon);
 app.use("/api/v1/payment", payment);
+app.use("/api/v1/patient", patient);
+app.use("/api/v1/report", report);
+app.use("/api/v1/booking", booking);
+app.use("/api/v1/package", package);
 
 // Middleware for Errors
 app.use(errorMiddleware);

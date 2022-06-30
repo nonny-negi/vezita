@@ -15,6 +15,10 @@ const packageSchema = new mongoose.Schema({
   salePrice: {
     type: Number,
   },
+  commissionPercentage: {
+    type: Number,
+    required: true,
+  },
   packageBenefits: [{ type: String }],
 });
 

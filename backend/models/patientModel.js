@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const patientSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    required: [true, "Name is required"],
+    unique: [true, "Name must be unique"],
   },
   phone: {
     type: Number,
@@ -41,8 +42,12 @@ const patientSchema = new mongoose.Schema({
     type: String,
   },
   avatar: {
-    public_id: { type: String },
-    url: { type: String },
+    public_id: {
+      type: String,
+    },
+    url: {
+      type: String,
+    },
   },
   user: {
     type: mongoose.Types.ObjectId,
@@ -50,4 +55,4 @@ const patientSchema = new mongoose.Schema({
   },
 });
 
-exports.module = mongoose.model("Patient", patientSchema);
+module.exports = mongoose.model("Patient", patientSchema);

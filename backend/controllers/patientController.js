@@ -1,8 +1,8 @@
 const ErrorHander = require("../utils/errorhander");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-
 const Patient = require("../models/patientModel");
 const PatientMedical = require("../models/patientHealthDetailModel");
+const mongoose = require("mongoose");
 
 //add-Patient-Personal Details
 exports.addPatient = catchAsyncErrors(async (req, res, next) => {
@@ -10,17 +10,17 @@ exports.addPatient = catchAsyncErrors(async (req, res, next) => {
   let addPatient = await Patient.create({
     user: user._id,
     name: req.body.name,
-    phone: req.body.phone,
+    phone: req.body.phone,  
     email: req.body.email,
     relation: req.body.relation,
     gender: req.body.gender,
     dob: req.body.dob,
     martialStatus: req.body.martialStatus,
-    hieght: req.body.hieght,
+    height: req.body.hieght,
     weight: req.body.weight,
     emergencyNumber: req.body.emergencyNumber,
     location: req.body.location,
-    avathar: req.body.avathar,
+    // avatar: req.body.avatar,
     address: req.body.address,
     zipcode: req.body.zipcode,
   });
@@ -33,6 +33,27 @@ exports.addPatient = catchAsyncErrors(async (req, res, next) => {
 
 //add-Patient-Medical Details
 exports.addPatientMedical = catchAsyncErrors(async (req, res, next) => {
+  const found = await PatientMedical.findOne({
+    patient: mongoose.Types.ObjectId(req.body.patientId),
+  });
+
+  if (found) {
+    found.bloodGroup = req.body.bloodGroup;
+    found.allergies = req.body.allergies;
+    found.medications = req.body.medications;
+    found.pastMedications = req.body.pastMedications;
+    found.chronicDisease = req.body.chronicDisease;
+    found.injuries = req.body.injuries;
+    found.surgeries = req.body.surgeries;
+
+    await found.save({ validateBeforeSave: false });
+
+    return res.status(200).json({
+      status: true,
+      patient: found,
+    });
+  }
+
   let addPatientMedical = await PatientMedical.create({
     patient: mongoose.Types.ObjectId(req.body.patientId),
     bloodGroup: req.body.bloodGroup,
@@ -105,7 +126,14 @@ exports.getSinglePatient = catchAsyncErrors(async (req, res, next) => {
 
 //Get User patient
 exports.getUserPatients = catchAsyncErrors(async (req, res, next) => {
-  let patient = await Patient.findById({ user: req.user._id });
+  let patient = await Patient.aggregate([
+    {
+      $match: { user: req.user._id },
+    },
+    {
+      $project: { name: 1, relation: 1, id: "$_id", _id: 0 },
+    },
+  ]);
   if (!patient) {
     return res.status(404).json({
       status: false,

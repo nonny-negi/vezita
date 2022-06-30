@@ -25,7 +25,6 @@ exports.createReview = catchAsyncErrors(async (req, res, next) => {
     await isReviewed.save({ validateBeforeSave: false });
   } else {
     const newReview = await Review.create({ ...review });
-
     docter.reviews.push(newReview._id);
     docter.numOfReviews = docter.reviews.length;
   }

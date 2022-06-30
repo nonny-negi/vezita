@@ -168,3 +168,13 @@ exports.deleteDocterService = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({ msg: "Service Deleted Successfully" });
 });
+
+// Get All Service By Docter
+
+exports.getAllServiceByDocter = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.user._id;
+
+  const results = await DocterService.find({ docter: userId });
+
+  res.status(200).json({ success: true, results });
+});

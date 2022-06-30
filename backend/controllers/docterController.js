@@ -6,6 +6,7 @@ const Establishment = require("../models/establishmentModel");
 const DocterMedicalRegistration = require("../models/docterMedicalRegistrationModel");
 const Docter = require("../models/docterModel");
 const DocterExperience = require("../models/docterExperienceModel");
+const DocterSpecialization = require("../models/docterSpecializationModel");
 
 const mongoose = require("mongoose");
 
@@ -136,6 +137,14 @@ exports.getMyProfile = catchAsyncErrors(async (req, res, next) => {
     },
     {
       $lookup: {
+        from: "docterexperiences",
+        localField: "_id",
+        foreignField: "docter",
+        as: "docter-experience-details",
+      },
+    },
+    {
+      $lookup: {
         from: "docterspecializations",
         localField: "_id",
         foreignField: "docter",
@@ -218,6 +227,7 @@ exports.getDocterProfileById = catchAsyncErrors(async (req, res, next) => {
               specialization: "$sp.name",
               icon: "$sp.icon.url",
               _id: 0,
+              d,
             },
           },
         ],
@@ -327,13 +337,13 @@ exports.addDocterExperience = catchAsyncErrors(async (req, res, next) => {
     end: req.body.end,
     role: req.body.role,
     city: req.body.city,
-    establishment: req.body.establishment,
+    establishmentName: req.body.establishmentName,
     docter: req.docter._id,
   };
 
-  await DocterExperience.create(data);
+  const de = await DocterExperience.create(data);
 
-  res.status(201).json({ msg: "success" });
+  res.status(201).json({ msg: "success", data: de });
 });
 
 //Update Docter Experience
@@ -363,4 +373,31 @@ exports.deleteDocterExperience = catchAsyncErrors(async (req, res, next) => {
 exports.getDocterExperience = catchAsyncErrors(async (req, res, next) => {
   const data = await DocterExperience.find({ docter: req.docter._id });
   res.status(200).json({ success: true, data });
+});
+
+//Get Docter's by specialization
+exports.getDocterBySpecialization = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+  const results = await Docter.aggregate([
+    {
+      $lookup: {
+        from: "docterspecializations",
+        localField: "_id",
+        foreignField: "docter",
+        as: "result",
+      },
+    },
+    {
+      $unwind: "$result",
+    },
+    {
+      $project: {
+        docters: "$result.docter",
+        id: "$result.specializationId",
+        _id: 0,
+      },
+    },
+  ]);
+
+  res.status(200).json({ success: true, results });
 });

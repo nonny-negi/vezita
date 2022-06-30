@@ -4,18 +4,19 @@ const patientHealthReportSchema = new mongoose.Schema({
   reportType: {
     type: String,
   },
-  reportFor: {
-    type: String,
-  },
   diagonsedFor: {
     type: String,
   },
-  report: [
-    {
-      public_id: { type: String, required: true }, //
-      url: { type: String, required: true },
+  report: {
+    public_id: {
+      type: String,
+      required: true,
     },
-  ],
+    url: {
+      type: String,
+      required: true,
+    },
+  },
   patient: {
     type: mongoose.Types.ObjectId,
     ref: "Patient",
@@ -23,7 +24,7 @@ const patientHealthReportSchema = new mongoose.Schema({
   },
 });
 
-exports.module = mongoose.model(
+module.exports = mongoose.model(
   "PatientHealthReport",
   patientHealthReportSchema
 );

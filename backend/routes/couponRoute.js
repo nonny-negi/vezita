@@ -17,6 +17,9 @@ router
 
 router.route("/").get(getAllCoupons);
 
-router.route("/:id").get(getCouponById).delete(deleteCoupon);
+router
+  .route("/:id")
+  .get(getCouponById)
+  .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteCoupon);
 
 module.exports = router;

@@ -47,7 +47,7 @@ const patientHealthDetailSchema = new mongoose.Schema({
   ],
 });
 
-exports.module = mongoose.model(
+module.exports = mongoose.model(
   "PatientHealthDetail",
   patientHealthDetailSchema
 );
