@@ -5,6 +5,7 @@ const DocterQualification = require("../models/docterQualificationModel");
 const Establishment = require("../models/establishmentModel");
 const DocterMedicalRegistration = require("../models/docterMedicalRegistrationModel");
 const Docter = require("../models/docterModel");
+const DocterExperience = require("../models/docterExperienceModel");
 
 const mongoose = require("mongoose");
 
@@ -230,16 +231,136 @@ exports.getDocterProfileById = catchAsyncErrors(async (req, res, next) => {
 //Add Education (Docter)
 exports.addEducation = catchAsyncErrors(async (req, res, next) => {
   const { qualification } = req.body;
+
   qualification.forEach(async (item) => {
-    await DocterQualification.create({ ...item, docter: req.docter });
+    await DocterQualification.create({ ...item, docter: req.docter._id });
   });
   res.status(201).json({ msg: "success" });
 });
 
+//Update Education
+exports.updateEducation = catchAsyncErrors(async (req, res, next) => {
+  const data = req.body;
+
+  await DocterQualification.findOneAndUpdate(
+    { docter: req.docter._id },
+    { $set: data }
+  );
+
+  res.status(200).json({ msg: "Updated Successfully" });
+});
+
 //Add Establishment
-exports.addEstablishment = catchAsyncErrors(async (req, res, next) => {});
+exports.addEstablishment = catchAsyncErrors(async (req, res, next) => {
+  const establishment = {
+    establishmentName: req.body.establishmentName, //
+    establishmentType: req.body.establishmentType, //
+    contactNumber: req.body.contactNumber, //
+    address: req.body.address, //
+    city: req.body.city,
+  };
+
+  const isChecked = await Establishment.find({
+    $and: [
+      { _id: req.docter._id },
+      { establishmentName: req.body.establishmentName },
+    ],
+  });
+
+  if (isChecked.length > 0)
+    return next(new ErrorHander("Establishment already exist !", 409));
+
+  const establishmentDetails = await Establishment.create({
+    ...establishment,
+    docter: req.docter._id,
+  });
+
+  res.status(201).json({ msg: "success", establishmentDetails });
+});
+
+//Update Establishment
+exports.updateEstablishment = catchAsyncErrors(async (req, res, next) => {
+  const data = req.body;
+
+  const e = await Establishment.findOneAndUpdate(
+    { docter: req.docter._id },
+    { ...data }
+  );
+  e.save();
+  res.status(200).json({ msg: "Updated Successfully" });
+});
 
 //Add Medical Details
 exports.addDocterMedicalRegistrationDetails = catchAsyncErrors(
-  async (req, res, next) => {}
+  async (req, res, next) => {
+    const data = {
+      registrationNumber: req.body.registrationNumber,
+      councilName: req.body.councilName,
+      year: req.body.year,
+      docter: req.docter._id,
+    };
+
+    await DocterMedicalRegistration.create(data);
+
+    res.status(201).json({ msg: "success" });
+  }
 );
+
+//Update Medical Details
+exports.updateDocterMedicalRegistrationdetails = catchAsyncErrors(
+  async (req, res, next) => {
+    const data = req.body;
+    const dmr = await DocterMedicalRegistration.findOneAndUpdate(
+      { docter: req.docter._id },
+      { ...data }
+    );
+
+    dmr.save();
+    res.status(200).json({ msg: "Update Successfully" });
+  }
+);
+
+//Add Docter Experience
+exports.addDocterExperience = catchAsyncErrors(async (req, res, next) => {
+  const data = {
+    start: req.body.start,
+    end: req.body.end,
+    role: req.body.role,
+    city: req.body.city,
+    establishment: req.body.establishment,
+    docter: req.docter._id,
+  };
+
+  await DocterExperience.create(data);
+
+  res.status(201).json({ msg: "success" });
+});
+
+//Update Docter Experience
+exports.updateDocterExperience = catchAsyncErrors(async (req, res, next) => {
+  const newData = req.body;
+
+  const de = await DocterExperience.findOneAndUpdate(
+    { _id: req.params.id },
+    { ...newData }
+  );
+
+  de.save();
+
+  res.status(200).json({ msg: "Updated Successfully" });
+});
+
+//Delete Docter Experience
+exports.deleteDocterExperience = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params.id;
+
+  await DocterExperience.findByIdAndDelete(id);
+
+  res.status(200).json({ msg: "Deleted Successfully" });
+});
+
+//Get Docter Experience Me
+exports.getDocterExperience = catchAsyncErrors(async (req, res, next) => {
+  const data = await DocterExperience.find({ docter: req.docter._id });
+  res.status(200).json({ success: true, data });
+});

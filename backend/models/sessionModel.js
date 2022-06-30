@@ -19,12 +19,12 @@ const sessionSchema = new mongoose.Schema({
   sessionType: {
     type: String,
     enum: ["online", "offline"],
-    startTime: {
-      type: Date,
-    },
-    endTime: {
-      type: Date,
-    },
+  },
+  startTime: {
+    type: Date,
+  },
+  endTime: {
+    type: Date,
   },
 });
 

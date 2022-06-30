@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const specializationSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Please Enter Your Email"],
+    required: [true, "Please Enter Speciality"],
     unique: true,
   },
   icon: {

@@ -4,6 +4,7 @@ const docterMedicalRegistrationSchema = new mongoose.Schema({
   registrationNumber: {
     type: String,
     required: true,
+    unique: true,
   },
   councilName: {
     type: String,

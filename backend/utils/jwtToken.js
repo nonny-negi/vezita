@@ -2,6 +2,7 @@
 
 const sendToken = (user, statusCode, res) => {
   const token = user.getJWTToken();
+  const refreshToken = user.getRefreshToken();
 
   // options for cookie
   const options = {
@@ -15,6 +16,7 @@ const sendToken = (user, statusCode, res) => {
     success: true,
     user,
     token,
+    refreshToken,
   });
 };
 
