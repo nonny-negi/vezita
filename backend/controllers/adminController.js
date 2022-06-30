@@ -201,7 +201,7 @@ exports.verifyQualiCertificate = async(req,res) =>{
 }
 
 //verify medicalRegistration certificate
-exports.verifyQualiCertificate = async(req,res) =>{
+exports.verifyMedicalRegCertificate = async(req,res) =>{
 
     let verifyMedicalRegCertificate = await DocterMedicalRegistration.findByIdAndUpdate(req.params.medicalRegistrationId,{new:true});
     res.status(200).json({
