@@ -29,9 +29,6 @@ const analyticsSchema = new mongoose.Schema({
             type:String
         },
     },
-    totalEarned:{
-        type:Number,
-    }
 });
 
 module.exports = mongoose.model("analytics",analyticsSchema);

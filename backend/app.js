@@ -22,11 +22,13 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Route Imports
-const admin = require("../routes/adminRoute");
-const booking = require("../routes/bookingRoute");
-const patient = require("../routes/patientRoute");
-const serviceAvailability = require("../routes/serviceAvailabilityRoute");
-const bookingCancelledReason = require("../routes/bookingCancelledReasonRoute");
+const admin = require("./routes/adminRoute");
+const booking = require("./routes/bookingRoute");
+const patient = require("./routes/patientRoute");
+const serviceAvailability = require("./routes/serviceAvailabilityRoute");
+const bookingCancelledReason = require("./routes/bookingCancelledReasonRoute");
+const prescription = require("./routes/prescriptionRoute");
+const analytics = require("./routes/analyticsRoute");
 const user = require("./routes/userRoute");
 const docter = require("./routes/docterRoute");
 const review = require("./routes/reviewRoute");
@@ -40,6 +42,8 @@ app.use("/api/v1/booking", booking);
 app.use("/api/v1/patient", patient);
 app.use("/api/v1/seviceAvailability",serviceAvailability);
 app.use("/api/v1/bookingCancelledReason",bookingCancelledReason);
+app.use("/api/v1/prescription",prescription);
+app.use("/api/v1/analytics",analytics);
 app.use("/api/v1/user", user);
 app.use("/api/v1/docter", docter);
 app.use("/api/v1/review", review);
