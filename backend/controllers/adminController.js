@@ -1,6 +1,6 @@
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 
-const User = require("../models/user");
+const User = require("../models/userModel");
 const Doctor = require("../models/docterModel");
 const DocterQualification = require("../models/docterQualificationModel");
 const DocterMedicalRegistration = require("../models/docterMedicalRegistrationModel");

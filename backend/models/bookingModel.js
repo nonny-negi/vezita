@@ -22,10 +22,6 @@ const bookingSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'DoctorLocation'
     },
-    bookingLocation:{
-        type:String,
-        enum:["onsite"]
-    },
     basePrice:{
         type:Number
     },
@@ -52,10 +48,6 @@ const bookingSchema = new mongoose.Schema({
         type:String,
         enum:["pending","confirmed","active","completed","cancelled"],
         default:"pending"
-    },
-    bookingByPlanManager:{
-        type:Boolean,
-        default:false
     },
     displayMessage1:{
         type:String

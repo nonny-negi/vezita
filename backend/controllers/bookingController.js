@@ -11,7 +11,7 @@ const {sendNotification} = require("../utils/notification");
 const Patient = require("../models/patientModel");
 const Doctor = require("../models/docterModel");
 const {sendOrderEmail} = require("../utils/sendEmail");
-// const doctorEarning = require("../models/doctorEarning");
+const analytics = require("../models/analyticsModel");
 
 
 function formatDate(date) {
@@ -141,7 +141,7 @@ exports.getBooking = catchAsyncErrors(async(req,res) =>{
         let bookedBy = req.user._id;
         req.query.bookedBy = bookedBy
 
-        if(req.query.st.atus==="upcoming"){
+        if(req.query.status==="upcoming"){
             bookedBy = mongoose.Types.ObjectId(bookedBy);
             let serviceDate = new Date()
             console.log(serviceDate)
@@ -246,9 +246,7 @@ exports.getBooking = catchAsyncErrors(async(req,res) =>{
                       "bookedBy":1,
                       "createdAt":1,
                       "updatedAt":1,
-                      "bookingLocation":1,
                       "serviceAvailability":1
-                    
                     }
                 }
             ]) 
@@ -543,8 +541,6 @@ exports.updateBookingStatus = catchAsyncErrors( async(req,res) =>{
     
             )
 
-        
-
         res.status(200).json({
             status:true,
             msg:"Booking updated.",
@@ -571,12 +567,12 @@ exports.acceptOrderByDoctor = catchAsyncErrors(async(req,res) =>{
                 msg:"There is no booking with this booking Id."
             })
         }
-        if(findBooking.bookingType !== "video"){
-            return res.status(400).json({
-                status:false,
-                msg:"it's is already verified."
-            })
-        }
+        // if(findBooking.bookingType !== "video"){
+        //     return res.status(400).json({
+        //         status:false,
+        //         msg:"it's is already verified."
+        //     })
+        // }
 
        
         findBooking.status="pending"
@@ -610,7 +606,16 @@ exports.acceptOrderByDoctor = catchAsyncErrors(async(req,res) =>{
                 findBooking._id
     
             )
-        }   
+        } 
+        let analytic = await analytics.Create({
+            doctor:doctor,
+            accepted:{
+                isAccepted:true,
+                time: Date(Date.now()).toLocaleTimeString(),
+                date: Date.now().toString(),
+            }
+        }) 
+        
         res.render("accept",{data:"order"});
         // res.status(200).json({
         //     status:true,
@@ -639,12 +644,12 @@ exports.declineOrderByDoctor = catchAsyncErrors( async(req,res) =>{
                 msg:"There is no booking with this booking Id."
             })
         }
-        if(findBooking.bookingType !== "video"){
-            return res.status(400).json({
-                status:false,
-                msg:"Booking is already verified."
-            })
-        }
+        // if(findBooking.bookingType !== "video"){
+        //     return res.status(400).json({
+        //         status:false,
+        //         msg:"Booking is already verified."
+        //     })
+        // }
 
         
         findBooking.status="cancelled"
@@ -664,9 +669,16 @@ exports.declineOrderByDoctor = catchAsyncErrors( async(req,res) =>{
                 `Your Booking for ${patient.name} with ${doctor.fullName} is cancelled.`,
                 "booking",
                 findBooking._id
-    
             )
-        }       
+        }   
+        let analytic = await analytics.Create({
+            doctor:doctor,
+            declined:{
+                isDeclined:true,
+                time: Date(Date.now()).toLocaleTimeString(),
+                date: Date.now().toString(),
+            }
+        })  
         res.render("decline"); 
         // res.status(200).json({
         //     status:true,
