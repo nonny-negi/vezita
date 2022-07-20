@@ -103,6 +103,7 @@ const sendPrescriptionEmail= (
   clientName,
   clientImage,
   doctorFullName,
+  prescriptionUrl,
   subject,
   ) =>{
   let p = path.join(__dirname,`../views/${templateName}.html`);
@@ -115,6 +116,7 @@ const sendPrescriptionEmail= (
           clientName:clientName,
           clientImage:clientImage,
           doctorFullName:doctorFullName,
+          prescriptionUrl:prescriptionUrl,
           subject:subject,
       };
       var htmlToSend = template(replacements);
