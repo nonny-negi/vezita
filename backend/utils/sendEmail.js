@@ -97,4 +97,40 @@ const sendOrderEmail = (
   });
 }
 
-module.exports = {sendEmail,sendOrderEmail}
+const sendPrescriptionEmail= (
+  templateName,
+  to,
+  clientName,
+  clientImage,
+  doctorFullName,
+  subject,
+  ) =>{
+  let p = path.join(__dirname,`../views/${templateName}.html`);
+
+
+  readHTMLFile(p, function(err, html) {
+      var template = handlebars.compile(html);
+      var replacements = {
+          to:to,
+          clientName:clientName,
+          clientImage:clientImage,
+          doctorFullName:doctorFullName,
+          subject:subject,
+      };
+      var htmlToSend = template(replacements);
+      var mailOptions = {
+          from: process.env.SMPT_MAIL,
+          to : to,
+          subject : `You have a new prescription from ${doctorFullName} for ${clientName}.`,
+          html : htmlToSend
+       };
+       transporter().sendMail(mailOptions, function (error, response) {
+          if (error) {
+              console.log(error);
+              callback(error);
+          }
+      });
+  });
+}
+
+module.exports = {sendEmail,sendOrderEmail,sendPrescriptionEmail}

@@ -13,5 +13,5 @@ router.route("/doctor/:docterId/get-all/:patientId")
 router.route("/user/:userId/get-all/")
 .get(isAuthenticatedUser, authorizeRoles("user"), prescriptionController.getAllPrescriptions);
 
-router.route("/user/:userId/get-all/:patientId")
+router.route("/user/:userId/get/:patientId/:prescriptionId")
 .get(isAuthenticatedUser, authorizeRoles("user"), prescriptionController.getOnePrescription);
