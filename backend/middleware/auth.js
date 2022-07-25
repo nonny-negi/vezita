@@ -3,12 +3,24 @@ const catchAsyncErrors = require("./catchAsyncErrors");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const Docter = require("../models/docterModel");
+const sendToken = require("../utils/jwtToken");
+
+exports.refreshToken = catchAsyncErrors(async (req, res, next) => {
+  const { refreshToken } = req.body;
+  const decodedData = jwt.verify(refreshToken, process.env.REFRSH_TOKEN_SECRET);
+
+  if (!decodedData) {
+    return next(new ErrorHander("Invalid Token ! Login again ", 401));
+  }
+  const user = await User.findById(decodedData.id);
+  sendToken(user, 200, res);
+});
 
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   let { token } = req.cookies;
   const { authorization } = req.headers;
   if (authorization) {
-    token = authorization;
+    token = authorization.split(" ")[1];
   }
 
   if (!token) {
@@ -18,8 +30,6 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   const decodedData = jwt.verify(token, process.env.JWT_SECRET);
 
   req.user = await User.findById(decodedData.id);
-
-  console.log("request sent by", req.user?.email);
 
   next();
 });

@@ -21,11 +21,16 @@ const bannerSchema = new mongoose.Schema({
     required: true,
   },
   status: {
-    type: Boolean,
-    default: false,
+    type: String,
+    enum: ["Rejected", "Pending", "Approved"],
+    default: "Pending",
   },
   bannerExpire: {
     type: Date,
+  },
+  reasonForRejection: {
+    type: String,
+    select: false,
   },
 });
 

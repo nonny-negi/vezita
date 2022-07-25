@@ -1,12 +1,15 @@
-const User = require("../models/user");
+const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+
+const User = require("../models/userModel");
 const Doctor = require("../models/docterModel");
 const DocterQualification = require("../models/docterQualificationModel");
 const DocterMedicalRegistration = require("../models/docterMedicalRegistrationModel");
+const Patient = require("../models/patientModel");
 
 const APIFeatures = require("../utils/apiFeatures");
 
 // Get all users
-exports.getAllUser = async (req, res) => {
+exports.getAllUser = catchAsyncErrors(async (req, res) => {
   // let users = await User.find({});
   let users;
   let search = req.query.search;
@@ -15,7 +18,7 @@ exports.getAllUser = async (req, res) => {
     users = await User.aggregate([
       {
         $match: {
-          $or: [{ name: { $regex: regex } }],
+          $and: [{ name: { $regex: regex } }, { role: "user" }],
         },
       },
     ]);
@@ -28,7 +31,7 @@ exports.getAllUser = async (req, res) => {
   }
 
   // users = await User.find({});
-  users = new APIFeatures(User.find(), req.query).filter();
+  users = new APIFeatures(User.find({ role: "user" }), req.query).filter();
   const doc = await users.query;
 
   res.status(200).json({
@@ -36,15 +39,10 @@ exports.getAllUser = async (req, res) => {
     results: doc.length,
     users: doc,
   });
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
-};
+});
 
 //get all detail for user
-exports.getUser = async (req, res) => {
+exports.getUser = catchAsyncErrors(async (req, res) => {
   let user = await User.findById(req.params.userId);
   if (!user) {
     return res.status(404).json({
@@ -56,15 +54,10 @@ exports.getUser = async (req, res) => {
     status: true,
     user,
   });
-
-  // return req.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
-};
+});
 
 //block user
-exports.blockUser = async (req, res) => {
+exports.blockUser = catchAsyncErrors(async (req, res) => {
   let user = await User.findById(req.params.userId);
   if (!user) {
     return res.status(404).json({
@@ -72,23 +65,53 @@ exports.blockUser = async (req, res) => {
       msg: "User not found.",
     });
   }
-  let updateUser = await User.findByIdAndUpdate(req.params.userId, req.body, {
-    new: true,
-  });
+  let updateUser = await User.findByIdAndUpdate(
+    req.params.userId,
+    { userStatus: req.body.status },
+    {
+      new: true,
+    }
+  );
   res.status(200).json({
     status: true,
     msg: "You blocked user",
     user: updateUser,
   });
+});
 
-  // return req.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
-};
+// Get all patient
+exports.getAllPatient = catchAsyncErrors(async (req, res, next) => {
+  let patients;
+  let search = req.query.search;
+  if (search) {
+    let regex = new RegExp([search].join(""), "i");
+    patients = await Patient.aggregate([
+      {
+        $match: {
+          $and: [{ name: { $regex: regex } }],
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      status: true,
+      results: patients.length,
+      patients,
+    });
+  }
+
+  patients = new APIFeatures(Patient.find({}), req.query).filter();
+  const doc = await patients.query;
+
+  res.status(200).json({
+    status: true,
+    results: doc.length,
+    users: doc,
+  });
+});
 
 // Get all doctors
-exports.getAlldoctor = async (req, res) => {
+exports.getAllDoctor = catchAsyncErrors(async (req, res) => {
   // let doctors = await doctor.find({});
 
   let doctors;
@@ -110,7 +133,7 @@ exports.getAlldoctor = async (req, res) => {
     });
   }
 
-  doctors = new APIFeatures(Doctor.find(), req.query).filter();
+  doctors = new APIFeatures(Doctor.find({}), req.query).filter();
   const doc = await doctors.query;
 
   res.status(200).json({
@@ -118,15 +141,10 @@ exports.getAlldoctor = async (req, res) => {
     results: doc.length,
     doctors: doc,
   });
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
-};
+});
 
 //get all detail for user
-exports.getdoctor = async (req, res) => {
+exports.getDoctor = catchAsyncErrors(async (req, res) => {
   let doctor = await Doctor.findById(req.params.doctorId)
     .populate("DocterQualification")
     .populate("DocterMedicalRegistration");
@@ -140,15 +158,10 @@ exports.getdoctor = async (req, res) => {
     status: true,
     doctor,
   });
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
-};
+});
 
 //block user
-exports.blockdoctor = async (req, res) => {
+exports.blockDoctor = catchAsyncErrors(async (req, res) => {
   let doctor = await Doctor.findById(req.params.doctorId);
   if (!doctor) {
     return res.status(404).json({
@@ -158,7 +171,7 @@ exports.blockdoctor = async (req, res) => {
   }
   let updateUser = await Doctor.findByIdAndUpdate(
     req.params.doctorId,
-    req.body,
+    { status: req.body.status },
     { new: true }
   );
   res.status(200).json({
@@ -166,15 +179,10 @@ exports.blockdoctor = async (req, res) => {
     msg: "You blocked doctor",
     doctor: updateUser,
   });
-
-  // return req.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
-};
+});
 
 //verify qualification certificate
-exports.verifyQualiCertificate = async (req, res) => {
+exports.verifyQualiCertificate = catchAsyncErrors(async (req, res) => {
   let verifyQualiCertificate = await DocterQualification.findByIdAndUpdate(
     req.params.qualificationId,
     { status: true },
@@ -184,15 +192,10 @@ exports.verifyQualiCertificate = async (req, res) => {
     status: false,
     DocterQualification: verifyQualiCertificate,
   });
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
-};
+});
 
 //verify medicalRegistration certificate
-exports.verifyMedicalRegCertificate = async (req, res) => {
+exports.verifyMedicalRegCertificate = catchAsyncErrors(async (req, res) => {
   let verifyMedicalRegCertificate =
     await DocterMedicalRegistration.findByIdAndUpdate(
       req.params.medicalRegistrationId,
@@ -202,9 +205,4 @@ exports.verifyMedicalRegCertificate = async (req, res) => {
     status: false,
     DocterMedicalRegistration: verifyMedicalRegCertificate,
   });
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
-};
+});

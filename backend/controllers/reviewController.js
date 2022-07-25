@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const Docter = require("../models/docterModel");
 const Review = require("../models/reviewModel");
 
+//new review
 exports.createReview = catchAsyncErrors(async (req, res, next) => {
   const { rating, comment, docterId } = req.body;
 
@@ -48,12 +49,15 @@ exports.createReview = catchAsyncErrors(async (req, res, next) => {
   res.status(201).json({ msg: "success" });
 });
 
+// get docter review
 exports.getDocterReview = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
 
   const docterReviews = await Docter.aggregate([
     {
-      $match: { _id: mongoose.Types.ObjectId(id) },
+      $match: {
+        $and: [{ _id: mongoose.Types.ObjectId(id) }, { status: "approve" }],
+      },
     },
     {
       $unwind: "$reviews",
@@ -103,9 +107,96 @@ exports.getDocterReview = catchAsyncErrors(async (req, res, next) => {
         },
       },
     },
-  ])
+  ]);
 
   if (!docterReviews[0]) return next(new ErrorHander("Invalid Id ", 404));
 
   res.status(200).json({ msg: "success", review: docterReviews[0] });
+});
+
+//get my review Docter
+exports.getMyReview = catchAsyncErrors(async (req, res, next) => {
+  const review = await Docter.aggregate([
+    {
+      $match: { _id: req.docter._id },
+    },
+    {
+      $unwind: "$reviews",
+    },
+    {
+      $lookup: {
+        from: "reviews",
+        localField: "reviews",
+        foreignField: "_id",
+        pipeline: [
+          {
+            $lookup: {
+              from: "users",
+              localField: "user",
+              foreignField: "_id",
+              as: "user",
+            },
+          },
+          {
+            $unwind: "$user",
+          },
+          {
+            $project: {
+              username: "$user.name",
+              comment: 1,
+              rating: 1,
+              _id: 1,
+            },
+          },
+        ],
+        as: "reviewObjects",
+      },
+    },
+
+    { $unwind: "$reviewObjects" },
+    {
+      $group: {
+        _id: "$_id",
+        totalRatings: { $first: "$totalRatings" },
+        totalReviews: { $first: "$numOfReviews" },
+        reviews: {
+          $push: {
+            name: "$reviewObjects.username",
+            comment: "$reviewObjects.comment",
+            rating: "$reviewObjects.rating",
+          },
+        },
+      },
+    },
+  ]);
+
+  if (!review[0]) return next(new ErrorHander("Invalid Id ", 404));
+
+  res.status(200).json({ msg: "success", review: review[0] });
+});
+
+//block review
+exports.blockReview = catchAsyncErrors(async (req, res, next) => {
+  const review = await Review.findById(req.params.id);
+
+  if (!review) return next(new ErrorHander("Invalid Id ", 404));
+
+  review.status = "block";
+
+  await review.save();
+
+  res.status(200).json({ success: true });
+});
+
+//approve review
+exports.approveReview = catchAsyncErrors(async (req, res, next) => {
+  const review = await Review.findById(req.params.id);
+
+  if (!review) return next(new ErrorHander("Invalid Id ", 404));
+
+  review.status = "approve";
+
+  await review.save();
+
+  res.status(200).json({ success: true });
 });

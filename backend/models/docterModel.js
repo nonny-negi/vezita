@@ -24,7 +24,7 @@ const docterSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["active", "pending", "inactive"],
+    enum: ["active", "pending", "inactive", "block"],
     default: "pending",
   },
   reviews: [

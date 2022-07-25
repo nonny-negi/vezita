@@ -2,17 +2,16 @@ const ErrorHander = require("../utils/errorhander");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 
 const Booking = require("../models/bookingModel");
-const doctorService = require("../models/docterServiceModel");
+const DoctorService = require("../models/docterServiceModel");
 const mongoose = require("mongoose");
 const APIFeatures = require("../utils/apiFeatures");
 const Session = require("../models/sessionModel");
 const ServiceAvailability = require("../models/serviceAvailability");
 const { sendNotification } = require("../utils/notification");
 const Patient = require("../models/patientModel");
-// const doctor = require("../models/doctorModel");
-// const SendEmail = require("../utils/sendEmail");
+const Doctor = require("../models/docterModel");
 const { sendOrderEmail } = require("../utils/sendEmail");
-// const doctorEarning = require("../models/doctorEarning");
+const analytics = require("../models/analyticsModel");
 
 function formatDate(date) {
   var d = new Date(date),
@@ -57,7 +56,7 @@ exports.createBooking = catchAsyncErrors(async (req, res) => {
 
   // console.log(booking.patient)
   let patientObj = await Patient.findById(booking.patient);
-  let service = await doctorService.findById(booking.service);
+  let service = await DoctorService.findById(booking.service);
   let serviceAvailability = await ServiceAvailability.findById(
     booking.serviceAvailability
   );
@@ -67,7 +66,7 @@ exports.createBooking = catchAsyncErrors(async (req, res) => {
       JSON.stringify(serviceAvailId._id) ==
       JSON.stringify(booking.availabilityId)
   );
-  let doctor = await doctor.findById(service.doctor);
+  let doctor = await Doctor.findById(service.doctor);
   if (booking.status === "pending") {
     //for customer app
     await sendNotification(
@@ -98,41 +97,26 @@ exports.createBooking = catchAsyncErrors(async (req, res) => {
   let timeTo = new Date(found[0].availableTo).toLocaleTimeString();
 
   // send email to doctor for accepting and declining
-  // sendOrderEmail(
-  //     "bookingOrder",
-  //     doctor.email,
-  //     patientObj.name,
-  //     patientObj.image,
-  //     service.name,
-  //     sDate,
-  //     timeFrom,
-  //     timeTo,
-  //     doctor.fullName,
-  //     booking.totalAmount,
-  //     "Booking Confirmation",
-  //     acceptUrl,
-  //     declineUrl
-  // )
-
-  // await sendNotification(
-  //     "test",
-  //     booking.bookedBy,
-  //     "Your booking has been created.",
-  //     "Your booking need to accepted by doctor",
-  //     "booking",
-  //     booking._id
-
-  // )
+  sendOrderEmail(
+    "bookingOrder",
+    doctor.email,
+    patientObj.name,
+    patientObj.image,
+    service.name,
+    sDate,
+    timeFrom,
+    timeTo,
+    Doctor.fullName,
+    booking.totalAmount,
+    "Booking Confirmation",
+    acceptUrl,
+    declineUrl
+  );
 
   res.status(200).json({
     status: true,
     booking,
   });
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
 });
 
 //get booking for customer app
@@ -143,7 +127,7 @@ exports.getBooking = catchAsyncErrors(async (req, res) => {
   if (req.query.status === "upcoming") {
     bookedBy = mongoose.Types.ObjectId(bookedBy);
     let serviceDate = new Date();
-    // console.log(serviceDate);
+    console.log(serviceDate);
     let booking = await Booking.aggregate([
       {
         $match: {
@@ -157,7 +141,7 @@ exports.getBooking = catchAsyncErrors(async (req, res) => {
       },
       {
         $lookup: {
-          from: "doctorService",
+          from: "DoctorService",
           localField: "service",
           foreignField: "_id",
           as: "service",
@@ -242,7 +226,6 @@ exports.getBooking = catchAsyncErrors(async (req, res) => {
           bookedBy: 1,
           createdAt: 1,
           updatedAt: 1,
-          bookingLocation: 1,
           serviceAvailability: 1,
         },
       },
@@ -280,15 +263,10 @@ exports.getBooking = catchAsyncErrors(async (req, res) => {
     results: doc.length,
     booking: doc,
   });
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
 });
 
 //get bookings for doctor app
-exports.getBookingFordoctor = async (req, res) => {
+exports.getBookingFordoctor = catchAsyncErrors(async (req, res) => {
   let { doctorId, serviceDate } = req.query;
   doctorId = mongoose.Types.ObjectId(doctorId);
   serviceDate = new Date(serviceDate);
@@ -296,7 +274,7 @@ exports.getBookingFordoctor = async (req, res) => {
   let bookings = await Booking.aggregate([
     {
       $lookup: {
-        from: "doctorService",
+        from: "DoctorService",
         localField: "service",
         foreignField: "_id",
         as: "service",
@@ -397,12 +375,7 @@ exports.getBookingFordoctor = async (req, res) => {
     results: bookings.length,
     bookings,
   });
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
-};
+});
 
 //update booking status for (cancelled or confirmed)
 exports.updateBookingStatus = catchAsyncErrors(async (req, res) => {
@@ -416,7 +389,7 @@ exports.updateBookingStatus = catchAsyncErrors(async (req, res) => {
     });
   }
 
-  let service = await doctorService.findById(booking.service);
+  let service = await DoctorService.findById(booking.service);
   if (!service) {
     return res.status(404).json({
       status: false,
@@ -450,10 +423,6 @@ exports.updateBookingStatus = catchAsyncErrors(async (req, res) => {
       (found[0].availableTo - found[0].availableFrom) / 1000;
     console.log(sessionDurationTimestamp);
 
-    // let h = Math.floor(sessionDurationTimestamp/3600);
-    // let m = Math.floor(sessionDurationTimestamp%3600/60);
-    // let s = Math.floor(sessionDurationTimestamp%3600%60);
-
     let checkSession = await Session.findOne({ booking: booking._id });
     if (!checkSession) {
       let createSession = await Session.create({
@@ -468,7 +437,7 @@ exports.updateBookingStatus = catchAsyncErrors(async (req, res) => {
   });
 
   let patient = await Patient.findById(updateBooking.patient);
-  let doctor = await doctor.findById(service.doctor);
+  let doctor = await Doctor.findById(service.doctor);
 
   if (updateBooking.status === "confirmed") {
     updateBooking.displayMessage2 = "Your Booking Has been Approved by doctor";
@@ -515,30 +484,19 @@ exports.updateBookingStatus = catchAsyncErrors(async (req, res) => {
     let timeFrom = new Date(found[0].availableFrom).toLocaleTimeString();
     let timeTo = new Date(found[0].availableTo).toLocaleTimeString();
 
-    // let checkdoctorEarning = await doctorEarning.findOne({doctor:doctor._id});
-    // if(!checkdoctorEarning){
-    //     await doctorEarning.create({
-    //         doctor:doctor._id,
-    //         pendingEarningByAdmin:updateBooking.totalAmount,
-    //     })
-    // }
-
-    // checkdoctorEarning.pendingEarningByAdmin = checkdoctorEarning.pendingEarningByAdmin + updateBooking.totalAmount
-    // await checkdoctorEarning.save();
-
-    // sendOrderEmail(
-    //     "orderCompletedEmail",
-    //     doctor.email,
-    //     patient.name,
-    //     patient.image,
-    //     service.name,
-    //     sDate,
-    //     timeFrom,
-    //     timeTo,
-    //     doctor.fullName,
-    //     booking.totalAmount,
-    //     "Booking Invoice"
-    // )
+    sendOrderEmail(
+      "orderCompletedEmail",
+      doctor.email,
+      patient.name,
+      patient.image,
+      service.name,
+      sDate,
+      timeFrom,
+      timeTo,
+      doctor.fullName,
+      booking.totalAmount,
+      "Booking Invoice"
+    );
   }
   updateBooking.displayMessage2 = "Your Session has been completed.";
   await updateBooking.save();
@@ -557,11 +515,6 @@ exports.updateBookingStatus = catchAsyncErrors(async (req, res) => {
     msg: "Booking updated.",
     booking: updateBooking,
   });
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
 });
 
 //accept order by doctor
@@ -575,19 +528,19 @@ exports.acceptOrderByDoctor = catchAsyncErrors(async (req, res) => {
       msg: "There is no booking with this booking Id.",
     });
   }
-  if (findBooking.bookingType !== "video") {
-    return res.status(400).json({
-      status: false,
-      msg: "it's is already verified.",
-    });
-  }
+  // if(findBooking.bookingType !== "video"){
+  //     return res.status(400).json({
+  //         status:false,
+  //         msg:"it's is already verified."
+  //     })
+  // }
 
   findBooking.status = "pending";
   findBooking.displayMessage2 = "Waiting for doctor approval";
   await findBooking.save();
 
   let patient = await Patient.findById(findBooking.patient);
-  let service = await doctorService.findById(findBooking.service);
+  let service = await DoctorService.findById(findBooking.service);
   let doctor = await doctor.findById(service.doctor);
 
   if (findBooking.status == "pending") {
@@ -611,16 +564,20 @@ exports.acceptOrderByDoctor = catchAsyncErrors(async (req, res) => {
       findBooking._id
     );
   }
+  let analytic = await analytics.Create({
+    doctor: doctor,
+    accepted: {
+      isAccepted: true,
+      time: Date(Date.now()).toLocaleTimeString(),
+      date: Date.now().toString(),
+    },
+  });
+
   res.render("accept", { data: "order" });
   // res.status(200).json({
   //     status:true,
   //     msg:`Booking for client ${patient.name} is accepted by doctor.`
   // })
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
 });
 
 // decline order by doctor
@@ -634,42 +591,45 @@ exports.declineOrderByDoctor = catchAsyncErrors(async (req, res) => {
       msg: "There is no booking with this booking Id.",
     });
   }
-  if (findBooking.bookingType !== "video") {
-    return res.status(400).json({
-      status: false,
-      msg: "Booking is already verified.",
-    });
-  }
+  // if(findBooking.bookingType !== "video"){
+  //     return res.status(400).json({
+  //         status:false,
+  //         msg:"Booking is already verified."
+  //     })
+  // }
 
   findBooking.status = "cancelled";
   findBooking.displayMessage2 = "Your Session has been declined by doctor";
   await findBooking.save();
 
   let patient = await Patient.findById(findBooking.patient);
-  let service = await doctorService.findById(findBooking.service);
-  let doctor = await doctor.findById(service.doctor);
+  let service = await DoctorService.findById(findBooking.service);
+  let doctor = await Doctor.findById(service.doctor);
 
   if (findBooking.status == "cancelled") {
     //for customer app
     await sendNotification(
       findBooking.bookedBy.toString(),
       findBooking.bookedBy,
-      `Your Booking for ${patient.name} with ${doctor.fullName}is cancelled.`,
-      `Your Booking for ${patient.name} with ${doctor.fullName}is cancelled.`,
+      `Your Booking for ${patient.name} with ${doctor.fullName} is cancelled.`,
+      `Your Booking for ${patient.name} with ${doctor.fullName} is cancelled.`,
       "booking",
       findBooking._id
     );
   }
+  let analytic = await analytics.Create({
+    doctor: doctor,
+    declined: {
+      isDeclined: true,
+      time: Date(Date.now()).toLocaleTimeString(),
+      date: Date.now().toString(),
+    },
+  });
   res.render("decline");
   // res.status(200).json({
   //     status:true,
   //     msg:`Booking for client ${patient.name} is declined by Doctor.`
   // })
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
 });
 
 // get all bookungs for admin
@@ -692,9 +652,4 @@ exports.getAllBookingsForAdmin = catchAsyncErrors(async (req, res) => {
     results: doc.length,
     booking: doc,
   });
-
-  // return res.status(500).json({
-  //   status: false,
-  //   msg: err.message,
-  // });
 });

@@ -1,31 +1,29 @@
 const mongoose = require("mongoose");
 
 const sessionSchema = new mongoose.Schema({
-  booking: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Booking",
-    required: true,
+  doctorId: {
+    type: mongoose.Types.ObjectId,
+    ref: "Docter",
   },
   duration: {
-    type: Number, //timestamp in seconds
-  },
-  completedInDuration: {
-    type: Number, // timestamp in seconds
-  },
-  active: {
-    type: Boolean,
-    default: true,
+    type: Number,
   },
   sessionType: {
     type: String,
     enum: ["online", "offline"],
   },
-  startTime: {
-    type: Date,
-  },
-  endTime: {
-    type: Date,
-  },
+  workingDays: [{ type: String }],
+  advanceBookingHour: { type: Number },
+  slot: [
+    {
+      startTime: {
+        type: Date,
+      },
+      endTime: {
+        type: Date,
+      },
+    },
+  ],
 });
 
 module.exports = mongoose.model("Session", sessionSchema);

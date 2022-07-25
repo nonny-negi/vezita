@@ -23,6 +23,9 @@ const docterPackageSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  expires: {
+    type: Date,
+  },
 });
 
 module.exports = mongoose.model("DocterPackage", docterPackageSchema);

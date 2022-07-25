@@ -33,7 +33,7 @@ const storageAvatarS3 = multerS3({
 
 const storageBannerS3 = multerS3({
   s3: imageS3,
-  bucket: "<S3_BUCKET_NAME>",
+  bucket: process.env.AWS_BUCKET,
   acl: "public-read",
   metadata(req, file, cb) {
     cb(null, {

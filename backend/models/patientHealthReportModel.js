@@ -22,6 +22,17 @@ const patientHealthReportSchema = new mongoose.Schema({
     ref: "Patient",
     required: true,
   },
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  shareToDocter: [
+    {
+      status: { type: Boolean },
+      docterId: { type: mongoose.Types.ObjectId, ref: "Docter" },
+    },
+  ],
 });
 
 module.exports = mongoose.model(

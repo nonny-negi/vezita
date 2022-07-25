@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema({
       default: false,
     },
   },
+  userStatus: {
+    type: String,
+    enum: ["block", "active"],
+  },
   avatar: {
     public_id: {
       type: String,
@@ -74,12 +78,12 @@ userSchema.methods.getJWTToken = function () {
   });
 };
 
-//Refresh Token 
+//Refresh Token
 userSchema.methods.getRefreshToken = function () {
   return jwt.sign({ id: this._id }, process.env.REFRSH_TOKEN_SECRET, {
     expiresIn: process.env.REFRESH_TOKEN_EXPIRE,
   });
-}
+};
 
 // Compare Password
 

@@ -23,10 +23,6 @@ const bookingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "DoctorLocation",
     },
-    bookingLocation: {
-      type: String,
-      enum: ["onsite"],
-    },
     basePrice: {
       type: Number,
     },
@@ -54,10 +50,6 @@ const bookingSchema = new mongoose.Schema(
       enum: ["pending", "confirmed", "active", "completed", "cancelled"],
       default: "pending",
     },
-    bookingByPlanManager: {
-      type: Boolean,
-      default: false,
-    },
     displayMessage1: {
       type: String,
     },
@@ -72,25 +64,4 @@ const bookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// bookingSchema.pre(/^find/,function(next){
-//     this.populate({
-//         path:'serviceAvailability',
-//         model:"ServiceAvailability",
-//         select:'-__v'
-//     });
-//     next();
-// });
-
-// bookingSchema.pre(/^find/,function(next){
-//     this.populate({
-//         path:'bookedBy',
-//         select:'-__v'
-//     });
-//     next();
-// });
-
-// const Booking = mongoose.model('Booking',bookingSchema);
-
-// module.exports=Booking;
-
-module.exports = mongoose.model("Booking", bookingSchema, "Booking");
+module.exports = mongoose.model("Booking", bookingSchema);

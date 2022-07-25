@@ -1,8 +1,4 @@
-const ErrorHander = require("../utils/errorhander");
-
 const DocterPackage = require("../models/docterPackageModel");
-
-
 
 exports.checkPackageStatus = () => {
   return async (req, res, next) => {

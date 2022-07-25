@@ -9,6 +9,7 @@ const {
   updatePackage,
   deletePackage,
   selectPackageByDocter,
+  getAllPackages,
 } = require("../controllers/packageController");
 
 //New package (Admin)
@@ -20,6 +21,11 @@ router
 router
   .route("/:id")
   .patch(isAuthenticatedUser, authorizeRoles("admin"), updatePackage);
+
+//Get All Packages (admin)
+router
+  .route("/")
+  .get(isAuthenticatedUser, authorizeRoles("admin"), getAllPackages);
 
 //Delete Package (Admin)
 router

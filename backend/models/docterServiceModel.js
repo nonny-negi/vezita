@@ -9,6 +9,10 @@ const docterServiceSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: "Specialization",
   },
+  serviceType: {
+    type: String, 
+    enum: ["fixed_price", "hourly_price"],
+  },
 });
 
 module.exports = mongoose.model("DocterService", docterServiceSchema);

@@ -21,6 +21,11 @@ const reviewSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: "Docter",
   },
+  status: {
+    type: String,
+    enum: ["approve", "block", "pending"], //
+    default: "pending",
+  },
 });
 
 module.exports = mongoose.model("Review", reviewSchema);

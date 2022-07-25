@@ -11,13 +11,18 @@ exports.newPackage = catchAsyncErrors(async (req, res, next) => {
     packageType: req.body.packageType,
     packagePrice: req.body.packagePrice,
     salePrice: req.body.salePrice,
-    commissionPercentage: req.body.commissionPercentage,
     packageBenefits: req.body.benefits,
   };
 
   const package = await Package.create(data);
 
   res.status(201).json({ success: true, package });
+});
+
+exports.getAllPackages = catchAsyncErrors(async (req, res, next) => {
+  const packages = await Package.find({});
+
+  res.status(200).json({ success: true, packages });
 });
 
 exports.updatePackage = catchAsyncErrors(async (req, res, next) => {
@@ -50,11 +55,9 @@ exports.deletePackage = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.selectPackageByDocter = catchAsyncErrors(async (req, res, next) => {
-  const packageId = req.params.id;
+  const packageId = req.body.packageId;
 
-  const package = await Package.findById(
-    mongoose.Types.ObjectId(req.params.id)
-  );
+  const package = await Package.findById(mongoose.Types.ObjectId(packageId));
 
   if (!package) return next(new ErrorHandler("Package Not Found !", 404));
 
@@ -85,10 +88,6 @@ exports.getActivePackageDocter = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({ activePackage, success: true });
 });
-
-exports.updateDocterPackageStatus = catchAsyncErrors(async(req,res,next)=>{
-  
-})
 
 exports.getAllDocterPackages = catchAsyncErrors(async (req, res, next) => {
   const packages = await DocterPackage.find({

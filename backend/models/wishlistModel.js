@@ -10,6 +10,10 @@ const wishlistSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: "user",
+  },
 });
 
 module.exports = mongoose.model("Wishlist", wishlistSchema);
