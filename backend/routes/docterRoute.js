@@ -9,6 +9,7 @@ const {
   addDocterExperience,
   addDocterMedicalRegistrationDetails,
   getDocterBySpecialization,
+  getAllDocterForCustormers,
 } = require("../controllers/docterController");
 
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
@@ -24,6 +25,10 @@ router
   .get(isAuthenticatedUser, authorizeRoles("admin"), getAllDocterProfile);
 
 router.route("/profile/:id").get(getDocterProfileById);
+
+router
+  .route("/profile-user/all")
+  .get(isAuthenticatedUser, authorizeRoles("user"), getAllDocterForCustormers);
 
 router
   .route("/profile-me")
@@ -49,6 +54,8 @@ router
     addDocterMedicalRegistrationDetails
   );
 
-router.route("/search/docter-by-specialization/:id").get(getDocterBySpecialization);
+router
+  .route("/search/docter-by-specialization/:id")
+  .get(getDocterBySpecialization);
 
 module.exports = router;

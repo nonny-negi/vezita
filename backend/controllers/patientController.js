@@ -10,7 +10,7 @@ exports.addPatient = catchAsyncErrors(async (req, res, next) => {
   let addPatient = await Patient.create({
     user: user._id,
     name: req.body.name,
-    phone: req.body.phone,  
+    phone: req.body.phone,
     email: req.body.email,
     relation: req.body.relation,
     gender: req.body.gender,
@@ -33,6 +33,17 @@ exports.addPatient = catchAsyncErrors(async (req, res, next) => {
 
 //add-Patient-Medical Details
 exports.addPatientMedical = catchAsyncErrors(async (req, res, next) => {
+  const patientId = await Patient.findById(
+    mongoose.Types.ObjectId(req.body.patientId)
+  );
+
+  if (!patientId) return next(new ErrorHander("Invalid PatientId", 404));
+
+  if (patientId.user !== req.user._id)
+    return next(
+      new ErrorHander("You don't have permission to access this resource", 400)
+    );
+
   const found = await PatientMedical.findOne({
     patient: mongoose.Types.ObjectId(req.body.patientId),
   });

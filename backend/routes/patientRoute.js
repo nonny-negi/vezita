@@ -24,7 +24,9 @@ router
   .route("/get/:patientId")
   .get(isAuthenticatedUser, authorizeRoles("user"), getSinglePatient);
 
-router.route("/add-patientMedical").put(addPatientMedical);
+router
+  .route("/add-patientMedical")
+  .put(isAuthenticatedUser, authorizeRoles("user"), addPatientMedical);
 
 router
   .route("/me")

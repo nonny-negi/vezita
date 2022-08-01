@@ -105,6 +105,76 @@ exports.getAllDocterProfile = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({ docters });
 });
 
+//user customer
+exports.getAllDocterForCustormers = catchAsyncErrors(async (req, res, next) => {
+  const docters = await Docter.aggregate([
+    {
+      $lookup: {
+        from: "establishments",
+        localField: "_id",
+        foreignField: "docter",
+        pipeline: [
+          
+          {
+            $project: {
+              _id: 0,
+              establishmentName: 1,
+              city: 1,
+            },
+          },
+        ],
+        as: "establishment",
+      },
+    },
+    {
+      $lookup: {
+        from: "docterspecializations",
+        localField: "_id",
+        foreignField: "docter",
+        pipeline: [
+          {
+            $lookup: {
+              from: "specializations",
+              localField: "specializationId",
+              foreignField: "_id",
+              as: "sp",
+            },
+          },
+          {
+            $unwind: "$sp",
+          },
+          // {
+          //   $group: {
+          //     _id: null,
+          //     name: { $push: "$sp.name" },
+          //   },
+          // },
+          {
+            $project: {
+              name: "$sp.name",
+
+              _id: 0,
+            },
+          },
+        ],
+        as: "specialization",
+      },
+    },
+    // {
+    //   $unwind: "$specialization",
+    // },
+    {
+      $project:{
+        reviews:0,
+        user:0,
+        __v:0,
+      
+      }
+    }
+  ]);
+  res.status(200).json({ docters });
+});
+
 //My Profile (Docter)
 exports.getMyProfile = catchAsyncErrors(async (req, res, next) => {
   const docter = await Docter.aggregate([
