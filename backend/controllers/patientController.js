@@ -33,9 +33,9 @@ exports.addPatient = catchAsyncErrors(async (req, res, next) => {
 
 //add-Patient-Medical Details
 exports.addPatientMedical = catchAsyncErrors(async (req, res, next) => {
-  const patientId = await Patient.findById(
-    mongoose.Types.ObjectId(req.body.patientId)
-  );
+  const patientId = await Patient.findOne({
+    _id: mongoose.Types.ObjectId(req.body.patientId),
+  });
 
   if (!patientId) return next(new ErrorHander("Invalid PatientId", 404));
 
