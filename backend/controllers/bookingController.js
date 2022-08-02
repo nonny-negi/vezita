@@ -124,7 +124,7 @@ exports.getBooking = catchAsyncErrors(async (req, res) => {
   let bookedBy = req.user._id;
   req.query.bookedBy = bookedBy;
 
-  if (req.query.status === "upcoming") {
+  if (req.query.status) {
     bookedBy = mongoose.Types.ObjectId(bookedBy);
     let serviceDate = new Date();
     console.log(serviceDate);
@@ -133,7 +133,7 @@ exports.getBooking = catchAsyncErrors(async (req, res) => {
         $match: {
           $and: [
             {
-              $or: [{ status: { $ne: "completed" } }],
+              $or: [{ status: { $ne: req.query.status } }],
             },
             { bookedBy: bookedBy },
           ],

@@ -16,7 +16,7 @@ exports.addPatient = catchAsyncErrors(async (req, res, next) => {
     gender: req.body.gender,
     dob: req.body.dob,
     martialStatus: req.body.martialStatus,
-    height: req.body.hieght,
+    height: req.body.height,
     weight: req.body.weight,
     emergencyNumber: req.body.emergencyNumber,
     location: req.body.location,
