@@ -75,7 +75,7 @@ exports.onBoarding = catchAsyncErrors(async (req, res, next) => {
     user = await User.create({
       email: email,
       uid: fbuser.uid,
-      name: displayName,
+      name: fbuser.name,
       avatar: photoUrl,
       // firebaseSignInProvider: fbuser.firebase.sign_in_provider,
       invitedBy: invitedBy,
