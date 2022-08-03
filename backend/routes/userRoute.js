@@ -18,7 +18,7 @@ const {
 } = require("../controllers/userController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
-const { verifyToken } = require("../middleware/firebase");
+const { verifyToken } = require("../middleware/firebaseAuth");
 
 const router = express.Router();
 
