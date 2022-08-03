@@ -46,7 +46,7 @@ exports.createTemporaryUser = catchAsyncErrors(async (req, res, next) => {
 
 exports.onBoarding = catchAsyncErrors(async (req, res, next) => {
   const { displayName, email, photoUrl } = req.body;
-  const fbuser =  await UserTemporary.findOne({email})
+  const fbuser = await UserTemporary.findOne({ email });
   let isNewUser = false;
   let user = await User.findOne({ email: email, uid: fbuser.uid });
 

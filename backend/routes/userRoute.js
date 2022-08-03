@@ -14,7 +14,7 @@ const {
   googleAuth,
   registerDocter,
   createTemporaryUser,
-  onBoarding
+  onBoarding,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
@@ -22,9 +22,11 @@ const router = express.Router();
 
 router.route("/google/auth").post(googleAuth);
 
-router.route("/register").post(createTemporaryUser);
+router.route("/register").post(registerUser);
 
-router.route("/on-boarding").post(onBoarding)
+router.route("/temp-user").post(createTemporaryUser);
+
+router.route("/on-boarding").post(onBoarding);
 
 router.route("/register-docter").post(registerDocter);
 
