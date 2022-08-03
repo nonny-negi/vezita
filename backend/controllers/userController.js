@@ -58,7 +58,6 @@ exports.onBoarding = catchAsyncErrors(async (req, res, next) => {
 
     user = await User.create({
       email: email,
-      phone: phone,
       uid: fbuser.uid,
       name: displayName,
       avatar: photoUrl,
