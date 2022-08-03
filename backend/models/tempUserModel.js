@@ -3,6 +3,12 @@ const Schema = mongoose.Schema;
 
 const userTemporarySchema = new Schema(
   {
+    name: {
+      type: String,
+    },
+    avatar: {
+      type: String,
+    },
     email: {
       type: String,
       required: true,
@@ -16,9 +22,6 @@ const userTemporarySchema = new Schema(
     isEmailVerified: {
       type: Boolean,
       default: false,
-    },
-    referralCode: {
-      type: String,
     },
     uid: {
       type: String,

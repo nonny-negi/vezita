@@ -47,16 +47,8 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  invitedBy: {
-    type: mongoose.Types.ObjectId,
-    ref: "User",
-  },
-  referralCode:{
-    type:String,
-    required:[true,"Provide Referral Code"]
-  },
-  firebaseSignInProvider:{
-    type:String
+  firebaseSignInProvider: {
+    type: String,
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
