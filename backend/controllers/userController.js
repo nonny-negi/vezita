@@ -3,7 +3,7 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const sendToken = require("../utils/jwtToken");
 const { sendEmail } = require("../utils/sendEmail");
 const crypto = require("crypto");
-const referralCodeGenerator = require("referral-code-generator");
+// const referralCodeGenerator = require("referral-code-generator");
 
 //models
 const UserWallet = require("../models/userWallet");
@@ -47,7 +47,7 @@ exports.createTemporaryUser = catchAsyncErrors(async (req, res, next) => {
 //on-boarding
 exports.onBoarding = catchAsyncErrors(async (req, res, next) => {
   const { email, displayName, photoUrl } = req.body;
-  const fbuser = await UserTemporary.findOne({ email });
+  const fbuser = req.fbuser;
   let isNewUser = false;
   let user = await User.findOne({ email: email, uid: fbuser.uid });
   if (!user) {
@@ -62,7 +62,7 @@ exports.onBoarding = catchAsyncErrors(async (req, res, next) => {
       uid: fbuser.uid,
       name: displayName,
       avatar: photoUrl,
-      // firebaseSignInProvider: fbuser.firebase.sign_in_provider,
+      firebaseSignInProvider: fbuser.firebase.sign_in_provider,
       isEmailVerified: true,
     });
     isNewUser = true;
