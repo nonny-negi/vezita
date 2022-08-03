@@ -60,6 +60,7 @@ exports.onBoarding = catchAsyncErrors(async (req, res, next) => {
       email: email,
       uid: fbuser.uid,
       name: displayName,
+      phone: 9560988345,
       avatar: photoUrl,
       firebaseSignInProvider: fbuser.firebase.sign_in_provider,
       isEmailVerified: true,
