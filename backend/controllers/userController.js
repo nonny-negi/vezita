@@ -47,7 +47,7 @@ exports.createTemporaryUser = catchAsyncErrors(async (req, res, next) => {
 //on-boarding
 exports.onBoarding = catchAsyncErrors(async (req, res, next) => {
   const { email, displayName, photoUrl } = req.body;
-  const fbuser = req.fbuser;
+  const fbuser = await UserTemporary.findOne({ email });
   let isNewUser = false;
   let user = await User.findOne({ email: email, uid: fbuser.uid });
   if (!user) {
@@ -62,7 +62,7 @@ exports.onBoarding = catchAsyncErrors(async (req, res, next) => {
       uid: fbuser.uid,
       name: displayName,
       avatar: photoUrl,
-      firebaseSignInProvider: fbuser.firebase.sign_in_provider,
+      // firebaseSignInProvider: fbuser.firebase.sign_in_provider,
       isEmailVerified: true,
     });
     isNewUser = true;
