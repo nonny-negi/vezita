@@ -10,6 +10,8 @@ const UserWallet = require("../models/userWallet");
 const User = require("../models/userModel");
 const UserTemporary = require("../models/tempUserModel");
 
+
+//temp user
 exports.createTemporaryUser = catchAsyncErrors(async (req, res, next) => {
   const { displayName, email, uid, inviteReferralCode } = req.body;
   let isNewUser = false;
@@ -44,6 +46,7 @@ exports.createTemporaryUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+//on-boarding
 exports.onBoarding = catchAsyncErrors(async (req, res, next) => {
   const { displayName, email, photoUrl } = req.body;
   const fbuser = await UserTemporary.findOne({ email });

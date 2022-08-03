@@ -22,9 +22,9 @@ const router = express.Router();
 
 router.route("/google/auth").post(googleAuth);
 
-router.route("/register").post(registerUser);
+router.route("/register").post(createTemporaryUser);
 
-router.route("/temp-user").post(createTemporaryUser);
+// router.route("/temp-user").post(createTemporaryUser);
 
 router.route("/on-boarding").post(onBoarding);
 
