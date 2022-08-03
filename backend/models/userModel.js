@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema({
     maxLength: [30, "Name cannot exceed 30 characters"],
     minLength: [4, "Name should have more than 4 characters"],
   },
+  uid: {
+    type: String,
+    required: true,
+  },
   email: {
     type: String,
     required: [true, "Please Enter Your Email"],
@@ -23,32 +27,16 @@ const userSchema = new mongoose.Schema({
     minLength: [8, "Password should be greater than 8 characters"],
     select: false,
   },
-  phone: {
-    type: Number,
-    required: [true, "Please Enter Phone Number"],
-    unique: true,
-  },
-  verificationStatus: {
-    phone: {
-      type: Boolean,
-      default: false,
-    },
-    email: {
-      type: Boolean,
-      default: false,
-    },
+  isEmailVerified: {
+    type: Boolean,
+    default: false,
   },
   userStatus: {
     type: String,
     enum: ["block", "active"],
   },
   avatar: {
-    public_id: {
-      type: String,
-    },
-    url: {
-      type: String,
-    },
+    type: String,
   },
   role: {
     type: String,
@@ -58,6 +46,17 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  invitedBy: {
+    type: mongoose.Types.ObjectId,
+    ref: "User",
+  },
+  referralCode:{
+    type:String,
+    required:[true,"Provide Referral Code"]
+  },
+  firebaseSignInProvider:{
+    type:String
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,

@@ -55,6 +55,7 @@ exports.addServiceAvailability = catchAsyncErrors(async (req, res) => {
     return res.status(201).json({
       status: true,
       availability,
+
     });
   } else if (service.serviceType === "hourly_price") {
     if (!req.body.hourlyAvailability) {
