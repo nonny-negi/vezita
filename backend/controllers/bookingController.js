@@ -68,7 +68,7 @@ exports.createBooking = catchAsyncErrors(async(req,res) =>{
         let service = await DoctorService.findById(booking.service);
         let serviceAvailability = await ServiceAvailability.findById(booking.serviceAvailability);
 
-        let found = serviceAvailability.fixedPriceAvailability.filter(
+        let found = serviceAvailability.availability.filter(
             (serviceAvailId) => JSON.stringify(serviceAvailId._id)==JSON.stringify(booking.availabilityId)
         );
         let doctor = await Doctor.findById(service.doctor);
@@ -419,7 +419,7 @@ exports.updateBookingStatus = catchAsyncErrors( async(req,res) =>{
             })
         }
 
-        let service = await doctorService.findById(booking.service)
+        let service = await DoctorService.findById(booking.service)
         if(!service){
             return res.status(404).json({
                 status:false,
@@ -437,12 +437,10 @@ exports.updateBookingStatus = catchAsyncErrors( async(req,res) =>{
         console.log(booking.availabilityId)
         if(req.body.status==="confirmed"){
             let availability;
-            if(service.serviceType==='fixed_price'){
-                availability = await ServiceAvailability.findOne({"fixedPriceAvailability._id":booking.availabilityId});
-            }else if(service.serviceType==='hourly_price'){
-                availability = await ServiceAvailability.findOne({"hourlyAvailability._id":booking.availabilityId});
+            if(service){
+                availability = await ServiceAvailability.findOne({"availability._id":booking.availabilityId});
             }
-            let found = availability.fixedPriceAvailability.filter(
+            let found = ServiceAvailability.availability.filter(
                 (avail) => avail._id.toString() == booking.availabilityId
             )
             let sessionDurationTimestamp = (found[0].availableTo-found[0].availableFrom)/1000
