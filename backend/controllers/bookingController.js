@@ -61,12 +61,12 @@ exports.createBooking = catchAsyncErrors(async (req, res) => {
     booking.serviceAvailability
   );
 
-  let found = serviceAvailability.fixedPriceAvailability.filter(
-    (serviceAvailId) =>
-      JSON.stringify(serviceAvailId._id) ==
-      JSON.stringify(booking.availabilityId)
-  );
-  let doctor = await Doctor.findById(service.doctor);
+  // let found = serviceAvailability.fixedPriceAvailability.filter(
+  //   (serviceAvailId) =>
+  //     JSON.stringify(serviceAvailId._id) ==
+  //     JSON.stringify(booking.availabilityId)
+  // );
+  let doctor = await Doctor.findById(doctorId);
   if (booking.status === "pending") {
     //for customer app
     await sendNotification(
@@ -80,8 +80,8 @@ exports.createBooking = catchAsyncErrors(async (req, res) => {
 
     //for doctor app
     await sendNotification(
-      service.doctor.toString(),
-      service.doctor,
+      // service.doctor.toString(),
+      // service.doctor,
       `Hurray!!!, ${patientObj.name} has booked you for a session.`,
       `Hurray!!!, ${patientObj.name} has booked you for a session.`,
       "booking",
@@ -93,8 +93,8 @@ exports.createBooking = catchAsyncErrors(async (req, res) => {
   let declineUrl = `https://api.vezita.com/api/v1/booking/doctor/decline/${booking._id}`;
 
   let sDate = formatDate(serviceAvailability.serviceDate);
-  let timeFrom = new Date(found[0].availableFrom).toLocaleTimeString();
-  let timeTo = new Date(found[0].availableTo).toLocaleTimeString();
+  // let timeFrom = new Date(found[0].availableFrom).toLocaleTimeString();
+  // let timeTo = new Date(found[0].availableTo).toLocaleTimeString();
 
   // send email to doctor for accepting and declining
   sendOrderEmail(

@@ -35,4 +35,20 @@ router
     serviceAvailabilityController.udpateAvailability
   );
 
+router
+  .route("/docter-availability")
+  .get(
+    isAuthenticatedUser,
+    authorizeRoles("docter"),
+    serviceAvailabilityController.getDocterAvailability
+  );
+
+router
+  .route("/add-docter-availability")
+  .post(
+    isAuthenticatedUser,
+    authorizeRoles("docter"),
+    serviceAvailabilityController.addDocterAvailability
+  );
+
 module.exports = router;

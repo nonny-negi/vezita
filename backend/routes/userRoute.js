@@ -26,7 +26,7 @@ router.route("/google/auth").post(googleAuth);
 
 router.route("/register").post(createTemporaryUser);
 
-// router.route("/temp-user").post(createTemporaryUser);
+router.route("/temp-user").post(registerUser);
 
 router.route("/on-boarding").post(verifyToken, onBoarding);
 

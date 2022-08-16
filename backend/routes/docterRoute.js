@@ -24,7 +24,9 @@ router
   .route("/all-profile")
   .get(isAuthenticatedUser, authorizeRoles("admin"), getAllDocterProfile);
 
-router.route("/profile/:id").get(getDocterProfileById);
+router
+  .route("/profile/:id")
+  .get(isAuthenticatedUser, authorizeRoles("user"), getDocterProfileById);
 
 router
   .route("/profile-user/all")

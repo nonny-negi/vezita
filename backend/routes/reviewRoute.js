@@ -16,7 +16,9 @@ router.route("/").put(isAuthenticatedUser, createReview);
 
 router.route("/:id").get(isAuthenticatedUser, getDocterReview);
 
-router.route("/docter/:id").get(isAuthenticatedUser, getMyReview);
+router
+  .route("/docter/:id")
+  .get(isAuthenticatedUser, authorizeRoles("docter"), getMyReview);
 
 router
   .route("/docter/approve/:id")

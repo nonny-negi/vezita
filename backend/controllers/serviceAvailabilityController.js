@@ -1,11 +1,16 @@
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-
+const ErrorHandler = require("../utils/errorhander");
 const ServiceAvailability = require("../models/serviceAvailability");
 
 const DoctorService = require("../models/docterServiceModel");
 const APIFeatures = require("../utils/apiFeatures");
 
+const Docter = require("../models/docterModel");
+const Slot = require("../models/docterSlotModel");
+const Session = require("../models/sessionModel");
+const Booking = require("../models/bookingModel");
 const mongoose = require("mongoose");
+const { validateBooking } = require("../utils/requirementValidator");
 
 //add availability
 exports.addServiceAvailability = catchAsyncErrors(async (req, res) => {
@@ -55,7 +60,6 @@ exports.addServiceAvailability = catchAsyncErrors(async (req, res) => {
     return res.status(201).json({
       status: true,
       availability,
-
     });
   } else if (service.serviceType === "hourly_price") {
     if (!req.body.hourlyAvailability) {
@@ -86,6 +90,7 @@ exports.addServiceAvailability = catchAsyncErrors(async (req, res) => {
 
 //get all availability of a single service
 exports.getAllAvailability = catchAsyncErrors(async (req, res) => {
+  let docterId = req.params.docterId;
   let serviceId = req.params.serviceId;
   console.log(req.query);
   let availability = new APIFeatures(
@@ -254,4 +259,142 @@ exports.udpateAvailability = catchAsyncErrors(async (req, res) => {
     status: true,
     availability,
   });
+});
+
+//get Docter availability
+exports.getDocterAvailability = catchAsyncErrors(async (req, res, next) => {
+  const { docterId } = req.query;
+  const availability = await Docter.aggregate([
+    {
+      $match: { _id: mongoose.Types.ObjectId(docterId) },
+    },
+    {
+      $lookup: {
+        from: "docterslots",
+        localField: "_id", //
+        foreignField: "doctorId",
+        as: "slots",
+      },
+    },
+    {
+      $lookup: {
+        from: "docterspecializations",
+        localField: "_id",
+        foreignField: "docter",
+        pipeline: [
+          {
+            $lookup: {
+              from: "specializations",
+              localField: "specializationId",
+              foreignField: "_id",
+              as: "sp",
+            },
+          },
+          {
+            $unwind: "$sp",
+          },
+          {
+            $project: {
+              name: "$sp.name",
+
+              _id: 0,
+            },
+          },
+        ],
+        as: "specialization",
+      },
+    },
+    {
+      $lookup: {
+        from: "establishments",
+        localField: "_id",
+        foreignField: "docter",
+        pipeline: [
+          {
+            $project: {
+              _id: 0,
+              establishmentName: 1,
+              city: 1,
+            },
+          },
+        ],
+        as: "establishment",
+      },
+    },
+    {
+      $project: {
+        reviews: 0,
+        user: 0,
+        __v: 0,
+        status: 0,
+      },
+    },
+  ]);
+  const consultedPatients = await Booking.count({
+    $and: [{ docterId }, { status: "completed" }],
+  });
+  res.status(200).json({
+    status: true,
+    availability: { ...availability[0], consultedPatients },
+  });
+});
+
+//add docter availability
+exports.addDocterAvailability = catchAsyncErrors(async (req, res, next) => {
+  let doctorId = req.docter._id;
+  console.log(req.body);
+
+  const { sessionType, duration, workingDays, advanceBookingHour, slots } =
+    req.body;
+
+  let checkSession = await Session.findOne({
+    $and: [{ doctorId }, { sessionType }],
+  });
+
+  if (checkSession) return next(new ErrorHandler("session already exits", 400));
+
+  const newSession = await Session.create({
+    sessionType,
+    duration,
+    workingDays,
+    advanceBookingHour,
+    doctorId,
+  });
+
+  let tempSlot = slots.map((slot) => {
+    return {
+      ...slot,
+      doctorId,
+      sessionId: newSession._id,
+    };
+  });
+
+  console.log(tempSlot);
+
+  const availableSlots = await Slot.insertMany(tempSlot);
+
+  res.status(200).json({
+    success: true,
+    availability: { availableSlots, session: newSession },
+  });
+});
+
+//availability check
+exports.checkSlotAvailability = catchAsyncErrors(async (req, res, next) => {
+  const { day, month, year, hour, minute, slotId } = req.body;
+
+  const checkAvail = validateBooking(year, month, day, hour, minute);
+  if (!checkAvail.success)
+    return next(new ErrorHandler(checkAvail.message, 500));
+
+  let isBookedSlot = await Booking.findOne({
+    $and: [
+      { slotId },
+      { $or: [{ status: "confirmed" }, { status: "completed" }] },
+    ],
+  });
+
+  if (isBookedSlot) return next(new ErrorHandler("slot not available", 500));
+
+  res.status(200).json({ success: true });
 });

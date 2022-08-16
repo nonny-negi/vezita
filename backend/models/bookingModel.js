@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
   {
-    service: {
+    slotId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "DoctorService",
+      ref: "DocterSlot",
     },
     serviceAvailability: {
       type: mongoose.Schema.Types.ObjectId,
@@ -13,15 +13,14 @@ const bookingSchema = new mongoose.Schema(
     },
     bookingType: {
       type: String,
-      enum: ["In-clinic", "Video"],
+      enum: ["in-clinic", "video"],
     },
     doctorId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Doctor",
+      ref: "Docter",
     },
     doctorLocation: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "DoctorLocation",
+      type: String,
     },
     basePrice: {
       type: Number,

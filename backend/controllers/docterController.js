@@ -114,7 +114,6 @@ exports.getAllDocterForCustormers = catchAsyncErrors(async (req, res, next) => {
         localField: "_id",
         foreignField: "docter",
         pipeline: [
-          
           {
             $project: {
               _id: 0,
@@ -164,14 +163,75 @@ exports.getAllDocterForCustormers = catchAsyncErrors(async (req, res, next) => {
     //   $unwind: "$specialization",
     // },
     {
-      $project:{
-        reviews:0,
-        user:0,
-        __v:0,
-      
-      }
-    }
+      $lookup: {
+        from: "bookings",
+        localField: "_id",
+        foreignField: "doctorId",
+
+        as: "consultedPatients",
+        pipeline: [
+          {
+            $match: { status: "completed" },
+          },
+
+          {
+            $count: "patients",
+          },
+        ],
+      },
+    },
+    { $unwind: "$consultedPatients" },
+    {
+      $lookup: {
+        from: "sessions",
+        localField: "_id",
+        foreignField: "doctorId",
+        as: "doctorSlots",
+        pipeline: [
+          {
+            $lookup: {
+              from: "docterslots",
+              localField: "_id",
+              foreignField: "sessionId",
+              as: "slots",
+              pipeline: [{ $project: { startTime: 1, endTime: 1 } }],
+            },
+          },
+          {
+            $project: {
+              consultationFee: 1,
+              sessionType: 1,
+              slotDays: "$workingDays",
+              slots: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $project: {
+        doctorName: { $concat: ["$title", " ", "$fullName"] },
+        consultedPatients: "$consultedPatients.patients",
+        numOfReviews: 1,
+        totalRatings: 1,
+        totalExperiences: 1,
+        establishment: 1,
+        specialization: {
+          $map: {
+            input: "$specialization",
+            as: "sp",
+            in: "$$sp.name",
+          },
+        },
+        doctorSlots: 1,
+
+        // reviews: 0,
+        // user: 0,
+        // __v: 0,
+      },
+    },
   ]);
+
   res.status(200).json({ docters });
 });
 
@@ -253,12 +313,13 @@ exports.getDocterProfileById = catchAsyncErrors(async (req, res, next) => {
     },
     {
       $lookup: {
-        from: "docterqualifications",
+        from: "reviews",
         localField: "_id",
-        foreignField: "docter",
-        as: "education",
+        foreignField: "user",
+        as: "reviews22",
       },
     },
+
     {
       $lookup: {
         from: "establishments",
@@ -269,12 +330,51 @@ exports.getDocterProfileById = catchAsyncErrors(async (req, res, next) => {
     },
     {
       $lookup: {
-        from: "doctermedicalregistrations",
+        from: "bookings",
         localField: "_id",
-        foreignField: "docter",
-        as: "medical-registration-details",
+        foreignField: "doctorId",
+
+        as: "consultedPatients",
+        pipeline: [
+          {
+            $match: { status: "completed" },
+          },
+
+          {
+            $count: "patients",
+          },
+        ],
       },
     },
+    { $unwind: "$consultedPatients" },
+    {
+      $lookup: {
+        from: "sessions",
+        localField: "_id",
+        foreignField: "doctorId",
+        as: "doctorSlots",
+        pipeline: [
+          {
+            $lookup: {
+              from: "docterslots",
+              localField: "_id",
+              foreignField: "sessionId",
+              as: "slots",
+              pipeline: [{ $project: { startTime: 1, endTime: 1 } }],
+            },
+          },
+          {
+            $project: {
+              consultationFee: 1,
+              sessionType: 1,
+              slotDays: "$workingDays",
+              slots: 1,
+            },
+          },
+        ],
+      },
+    },
+
     {
       $lookup: {
         from: "docterspecializations",
@@ -297,11 +397,63 @@ exports.getDocterProfileById = catchAsyncErrors(async (req, res, next) => {
               specialization: "$sp.name",
               icon: "$sp.icon.url",
               _id: 0,
-              d,
             },
           },
         ],
         as: "specialization",
+      },
+    },
+    {
+      $lookup: {
+        from: "docterservices",
+        localField: "_id",
+        foreignField: "docter",
+        pipeline: [
+          {
+            $lookup: {
+              from: "services",
+              localField: "serviceId",
+              foreignField: "_id",
+              as: "services",
+            },
+          },
+          {
+            $unwind: "$services",
+          },
+          {
+            $project: {
+              service: "$services.name",
+              icon: "$services.icon.url",
+              _id: 0,
+            },
+          },
+        ],
+        as: "services",
+      },
+    },
+    {
+      $project: {
+        services: {
+          $map: {
+            input: "$services",
+            as: "service",
+            in: "$$service.service",
+          },
+        },
+        specialization: {
+          $map: {
+            input: "$specialization",
+            as: "sp",
+            in: "$$sp.specialization",
+          },
+        },
+        doctorSlots: 1,
+        doctorName: { $concat: ["$title", " ", "$fullName"] },
+        consultedPatients: "$consultedPatients.patients",
+        numOfReviews: 1,
+        totalRatings: 1,
+        totalExperiences: 1,
+        establishment: 1,
       },
     },
   ]);

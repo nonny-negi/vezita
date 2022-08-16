@@ -61,6 +61,7 @@ function validateBooking(year, month, day, hour, minute) {
       success: false,
       message: "Cannot book with less than 24 hours in advance",
     };
+  return { success: true };
 }
 
 function validateGetTimeslots(year, month, day) {

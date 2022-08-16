@@ -10,20 +10,18 @@ const sessionSchema = new mongoose.Schema({
   },
   sessionType: {
     type: String,
-    enum: ["online", "offline"],
+    enum: ["in-clinic", "video"],
   },
-  workingDays: [{ type: String }],
-  advanceBookingHour: { type: Number },
-  slot: [
+  workingDays: [
     {
-      startTime: {
-        type: Date,
-      },
-      endTime: {
-        type: Date,
-      },
+      type: String,
     },
   ],
+  advanceBookingHour: {
+    type: Number,
+    default: 36,
+  },
+  consultationFee: { type: Number },
 });
 
 module.exports = mongoose.model("Session", sessionSchema);

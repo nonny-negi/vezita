@@ -56,7 +56,7 @@ exports.getDocterReview = catchAsyncErrors(async (req, res, next) => {
   const docterReviews = await Docter.aggregate([
     {
       $match: {
-        $and: [{ _id: mongoose.Types.ObjectId(id) }, { status: "approve" }],
+        $and: [{ user: mongoose.Types.ObjectId(id) }],
       },
     },
     {
@@ -109,7 +109,8 @@ exports.getDocterReview = catchAsyncErrors(async (req, res, next) => {
     },
   ]);
 
-  if (!docterReviews[0]) return next(new ErrorHander("Invalid Id ", 404));
+  if (!docterReviews[0])
+    return next(new ErrorHander("Not reviewed yet ! ", 404));
 
   res.status(200).json({ msg: "success", review: docterReviews[0] });
 });
@@ -118,7 +119,7 @@ exports.getDocterReview = catchAsyncErrors(async (req, res, next) => {
 exports.getMyReview = catchAsyncErrors(async (req, res, next) => {
   const review = await Docter.aggregate([
     {
-      $match: { _id: req.docter._id },
+      $match: { user: req.user._id },
     },
     {
       $unwind: "$reviews",
