@@ -7,6 +7,10 @@ const serviceAvailabilitySchema = new mongoose.Schema(
       ref: "DoctorService",
       required: true,
     },
+    docter: {
+      type: mongoose.Types.ObjectId,
+      ref: "Docter",
+    },
     serviceDate: {
       type: Date,
     },
@@ -16,50 +20,28 @@ const serviceAvailabilitySchema = new mongoose.Schema(
     closingTime: {
       type: Date,
     },
-    fixedPriceAvailability: [
+    availability:[
       {
-        availableFrom: {
-          type: Date,
-        },
-        availableTo: {
-          type: Date,
-        },
-        isAvailable: {
-          type: Boolean,
-          default: true,
-        },
-        isBooked: {
-          type: Boolean,
-          default: false,
-        },
-        bookedBy: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        },
-      },
-    ],
-    hourlyAvailability: [
-      {
-        availableFrom: {
-          type: Date,
-        },
-        availableTo: {
-          type: Date,
-        },
-        isAvailable: {
-          type: Boolean,
-          default: true,
-        },
-        isBooked: {
-          type: Boolean,
-          default: false,
-        },
-        bookedBy: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        },
-      },
-    ],
+          availableFrom:{
+              type:Date
+          },
+          availableTo:{
+              type:Date
+          },
+          isAvailable:{
+              type:Boolean,
+              default:true
+          },
+          isBooked:{
+              type:Boolean,
+              default:false
+          },
+          bookedBy:{
+              type:mongoose.Schema.Types.ObjectId,
+              ref:'User'
+          }
+      }
+  ],
     isDayOf: {
       type: Boolean,
       default: false,

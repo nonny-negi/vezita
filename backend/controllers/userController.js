@@ -107,25 +107,63 @@ exports.googleAuth = catchAsyncErrors(async (req, res, next) => {
 
 // Register a User
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-  const { name, email, password, phone } = req.body;
+  const { name, email, password} = req.body;
+  if(!name){
+    return res.status(400).json({
+        status:false,
+        msg:"Please provide name."
+    })
+  }
+
+  if(!password){
+      return res.status(400).json({
+          status:false,
+          msg:"Password can't be empty."
+      })
+  }
+
+
+  let checkUser = await User.findOne({username:email});
+  if(checkUser){
+      return res.status(400).json({
+          status:false,
+          msg:"A user exist with this email."
+      })
+  }
+
   const user = await User.create({
     name,
     email,
     password,
-    phone,
   });
+
   sendToken(user, 201, res);
 });
 
 //register a Docter
 exports.registerDocter = catchAsyncErrors(async (req, res, next) => {
-  const { name, email, password, phone } = req.body;
+  const {email, password} = req.body;
+
+  if(!password){
+    return res.status(400).json({
+        status:false,
+        msg:"Password can't be empty."
+    })
+  }
+  
+  
+  let checkUser = await User.findOne({username:email});
+  if(checkUser){
+      return res.status(400).json({
+          status:false,
+          msg:"A user exist with this email."
+      })
+  }
+
   const user = await User.create({
-    name,
     email,
     password,
     role: "docter",
-    phone,
   });
   sendToken(user, 201, res);
 });

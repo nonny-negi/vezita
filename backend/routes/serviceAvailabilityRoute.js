@@ -4,7 +4,7 @@ const serviceAvailabilityController = require("../controllers/serviceAvailabilit
 const router = require("express").Router();
 
 router
-  .route("/:serviceId/availability")
+  .route("/:serviceId/add-availability")
   .post(
     isAuthenticatedUser,
     authorizeRoles("docter"),
