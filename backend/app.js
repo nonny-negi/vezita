@@ -6,7 +6,7 @@ const cors = require("cors");
 
 const errorMiddleware = require("./middleware/error");
 
-const { refreshToken } = require("./middleware/auth");
+// const { refreshToken } = require("./middleware/auth");
 
 // Config
 if (process.env.NODE_ENV !== "PRODUCTION") {
@@ -19,9 +19,18 @@ app.use(
   })
 );
 
-app.use(express.json({ limit: "50mb" }));
+app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+app.get("/",(req,res) =>{
+  res.status(200).json({
+      status:true,
+      msg:"working...",
+      user:req.user
+  })
+})
 
 // Route Imports
 const user = require("./routes/userRoute");
@@ -61,7 +70,7 @@ app.use("/api/v1/analytics", analytics);
 
 //refreshToken
 
-app.post("/api/v1/refreshToken", refreshToken);
+// app.post("/api/v1/refreshToken", refreshToken);
 
 //random route
 app.use("/*", (req, res, next) => {

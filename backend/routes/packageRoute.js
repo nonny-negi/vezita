@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const {requiresAuth,restrictTo}=require("../middleware/firebaseAuth")
 
 const {
   newPackage,
@@ -15,26 +15,26 @@ const {
 //New package (Admin)
 router
   .route("/new")
-  .post(isAuthenticatedUser, authorizeRoles("admin"), newPackage);
+  .post(requiresAuth,restrictTo('admin'), newPackage);
 
 //Update Package (Admin)
 router
   .route("/:id")
-  .patch(isAuthenticatedUser, authorizeRoles("admin"), updatePackage);
+  .patch(requiresAuth,restrictTo('admin'), updatePackage);
 
 //Get All Packages (admin)
 router
   .route("/")
-  .get(isAuthenticatedUser, authorizeRoles("admin"), getAllPackages);
+  .get(getAllPackages);
 
 //Delete Package (Admin)
 router
   .route("/:id")
-  .delete(isAuthenticatedUser, authorizeRoles("admin"), deletePackage);
+  .delete(requiresAuth,restrictTo('admin'), deletePackage);
 
 //Select package By Docter
 router
   .route("/new/docter-package")
-  .post(isAuthenticatedUser, authorizeRoles("docter"), selectPackageByDocter);
+  .post(requiresAuth,restrictTo('docter'), selectPackageByDocter);
 
 module.exports = router;

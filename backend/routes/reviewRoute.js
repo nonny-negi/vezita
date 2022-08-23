@@ -8,24 +8,24 @@ const {
   getMyReview,
 } = require("../controllers/reviewController");
 
-const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const {requiresAuth,restrictTo}=require("../middleware/firebaseAuth")
 
 const router = express.Router();
 
-router.route("/").put(isAuthenticatedUser, createReview);
+router.route("/").put(requiresAuth, createReview);
 
-router.route("/:id").get(isAuthenticatedUser, getDocterReview);
+router.route("/:id").get(getDocterReview);
 
 router
   .route("/docter/:id")
-  .get(isAuthenticatedUser, authorizeRoles("docter"), getMyReview);
+  .get(getMyReview);
 
 router
   .route("/docter/approve/:id")
-  .patch(isAuthenticatedUser, authorizeRoles("docter"), approveReview);
+  .patch(requiresAuth,restrictTo('docter'), approveReview);
 
 router
   .route("/docter/block/:id")
-  .patch(isAuthenticatedUser, authorizeRoles("docter"), blockReview);
+  .patch(requiresAuth,restrictTo('docter'), blockReview);
 
 module.exports = router;

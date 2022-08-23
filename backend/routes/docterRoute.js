@@ -1,4 +1,7 @@
 const express = require("express");
+
+const {requiresAuth,restrictTo}=require("../middleware/firebaseAuth")
+
 const {
   docterProfile,
   getAllDocterProfile,
@@ -12,47 +15,44 @@ const {
   getAllDocterForCustormers,
 } = require("../controllers/docterController");
 
-const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
-
 const router = express.Router();
 
 router
   .route("/profile")
-  .put(isAuthenticatedUser, authorizeRoles("docter"), docterProfile);
+  .put(requiresAuth,restrictTo('docter'), docterProfile);
 
 router
   .route("/all-profile")
-  .get(isAuthenticatedUser, authorizeRoles("admin"), getAllDocterProfile);
+  .get(getAllDocterProfile);
 
 router
   .route("/profile/:id")
-  .get(isAuthenticatedUser, authorizeRoles("user"), getDocterProfileById);
+  .get(getDocterProfileById);
 
 router
   .route("/profile-user/all")
-  .get(isAuthenticatedUser, authorizeRoles("user"), getAllDocterForCustormers);
+  .get(getAllDocterForCustormers);
 
 router
   .route("/profile-me")
-  .get(isAuthenticatedUser, authorizeRoles("docter"), getMyProfile);
+  .get(getMyProfile);
 
 router
   .route("/add-qualification")
-  .post(isAuthenticatedUser, authorizeRoles("docter"), addEducation);
+  .post(requiresAuth,restrictTo('docter'), addEducation);
 
 router
   .route("/add-establishment")
-  .post(isAuthenticatedUser, authorizeRoles("docter"), addEstablishment);
+  .post(requiresAuth,restrictTo('docter'), addEstablishment);
 
 router
   .route("/add-experience")
-  .post(isAuthenticatedUser, authorizeRoles("docter"), addDocterExperience);
+  .post(requiresAuth,restrictTo('docter'), addDocterExperience);
 
 router
   .route("/add-medical-registration-detail")
   .post(
-    isAuthenticatedUser,
-    authorizeRoles("docter"),
+    requiresAuth,restrictTo('docter'),
     addDocterMedicalRegistrationDetails
   );
 

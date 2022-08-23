@@ -16,62 +16,61 @@ const {
   deleteDocterService,
 } = require("../controllers/serviceController");
 
-const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const {requiresAuth,restrictTo}=require("../middleware/firebaseAuth")
 
 const router = express.Router();
 
 //Admin
 router
   .route("/new-specialization")
-  .post(isAuthenticatedUser, authorizeRoles("admin"), addSpecialization);
+  .post(requiresAuth,restrictTo('admin'), addSpecialization);
 
 //Admin
 router
   .route("/specialization/:id")
-  .patch(isAuthenticatedUser, authorizeRoles("admin"), updateSpecialization)
-  .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteSpecialization);
+  .patch(requiresAuth,restrictTo('admin'), updateSpecialization)
+  .delete(requiresAuth,restrictTo('admin'), deleteSpecialization);
 
 // Get All Specialization (Docter,User)
-router.route("/specializations").get(isAuthenticatedUser, getAllSpecialization);
+router.route("/specializations").get(getAllSpecialization);
 
 //Add Docter Specialization (Docter)
 router
   .route("/add-docter-specialization")
-  .post(isAuthenticatedUser, authorizeRoles("docter"), addDocterSpecialization);
+  .post(requiresAuth,restrictTo('docter'), addDocterSpecialization);
 
 //My Specialization (Docter)
 router
   .route("/docter-specialization/me")
-  .get(isAuthenticatedUser, authorizeRoles("docter"), mySpecialization);
+  .get(mySpecialization);
 
 //Delete Docter Specialization (Docter)
 router
   .route("/docter-specialization/:id")
   .delete(
-    isAuthenticatedUser,
-    authorizeRoles("docter"),
+    requiresAuth,restrictTo('docter'),
     deleteDocterSpecialization
   );
 
 //Add Service (Admin)
 router
   .route("/new")
-  .post(isAuthenticatedUser, authorizeRoles("admin"), addServices);
+  .post(requiresAuth,restrictTo('admin'), addServices);
 
 //Delete Service
 router
   .route("/:id")
-  .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteService);
+  .delete(requiresAuth,restrictTo('admin'), deleteService);
 
 //Add Docter Service
 router
   .route("/add-docter-service")
-  .post(isAuthenticatedUser, authorizeRoles("docter"), addDocterServices);
+  .post(requiresAuth,restrictTo('docter'), addDocterServices);
 
 //Delete Docter Service  
 router
   .route("/delete-docter-service/:id")
-  .delete(isAuthenticatedUser, authorizeRoles("docter"), deleteDocterService);
+  .delete(requiresAuth,restrictTo('docter'), deleteDocterService);
 
 //Get service (User,Docter,Admin)
 router.route("/").get(getAllServices);

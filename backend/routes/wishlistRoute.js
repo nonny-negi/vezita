@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const {requiresAuth,restrictTo}=require("../middleware/firebaseAuth")
 
 const {
   addToWishlist,
@@ -12,14 +12,14 @@ const {
 
 router
   .route("/add-to-wishlist")
-  .post(isAuthenticatedUser, authorizeRoles("user"), addToWishlist);
+  .post(requiresAuth,restrictTo('user'), addToWishlist);
 
 router
   .route("/my-wishlist")
-  .get(isAuthenticatedUser, authorizeRoles("user"), getMyWishlist);
+  .get(getMyWishlist);
 
 router
   .route("/remove-from-wishlist/:id")
-  .delete(isAuthenticatedUser, authorizeRoles("user"), removeFromWishlist);
+  .delete(requiresAuth, restrictTo('user'), removeFromWishlist);
 
 module.exports = router;

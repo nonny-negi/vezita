@@ -8,28 +8,28 @@ const {
   getUserPatients,
 } = require("../controllers/patientController");
 
-const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const {requiresAuth,restrictTo}=require("../middleware/firebaseAuth")
 
 const router = express.Router();
 
 router
   .route("/add")
-  .post(isAuthenticatedUser, authorizeRoles("user"), addPatient);
+  .post(requiresAuth,restrictTo('user'), addPatient);
 
 router
   .route("/edit/:patientId")
-  .patch(isAuthenticatedUser, authorizeRoles("user"), updatePatient);
+  .patch(requiresAuth,restrictTo('user'), updatePatient);
 
 router
   .route("/get/:patientId")
-  .get(isAuthenticatedUser, authorizeRoles("user"), getSinglePatient);
+  .get(getSinglePatient);
 
 router
   .route("/add-patientMedical")
-  .put(isAuthenticatedUser, authorizeRoles("user"), addPatientMedical);
+  .put(requiresAuth,restrictTo('user'), addPatientMedical);
 
 router
   .route("/me")
-  .get(isAuthenticatedUser, authorizeRoles("user"), getUserPatients);
+  .get(getUserPatients);
 
 module.exports = router;

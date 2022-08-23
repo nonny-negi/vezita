@@ -11,37 +11,37 @@ const {
   uploadDoctorCert,
 } = require("../controllers/reportController");
 
-const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const {requiresAuth,restrictTo}=require("../middleware/firebaseAuth")
 
 const router = express.Router();
 
 router
   .route("/patient-report/new")
-  .post(isAuthenticatedUser, authorizeRoles("user"), addPatientReport);
+  .post(requiresAuth,restrictTo('user'), addPatientReport);
 
 router
   .route("/:id")
-  .patch(isAuthenticatedUser, authorizeRoles("user"), updatePatientReport)
-  .delete(isAuthenticatedUser, authorizeRoles("user"), deletePatientReport);
+  .patch(requiresAuth,restrictTo('user'), updatePatientReport)
+  .delete(requiresAuth,restrictTo('user'), deletePatientReport);
 
 router
   .route("/get/patient-report/:patientId")
-  .get(isAuthenticatedUser, authorizeRoles("user"), getPatientReport);
+  .get(getPatientReport);
 
 router
   .route("/single/patient-report/:id")
-  .get(isAuthenticatedUser, authorizeRoles("user"), getSinglePatientReport);
+  .get(getSinglePatientReport);
 
 router
   .route("/share/docter/:docterId/:reportId")
-  .patch(isAuthenticatedUser, authorizeRoles("user"), shareReportToDocter);
+  .patch(requiresAuth,restrictTo('user'), shareReportToDocter);
 
 router
   .route("/patient-for-docter/:patientId")
-  .get(isAuthenticatedUser, authorizeRoles("user"), getPatientReportForDocter);
+  .get(getPatientReportForDocter);
 
 router
   .route("/upload/docter/cert")
-  .post(isAuthenticatedUser, authorizeRoles("docter"), uploadDoctorCert);
+  .post(requiresAuth,restrictTo('docter'), uploadDoctorCert);
 
 module.exports = router;
