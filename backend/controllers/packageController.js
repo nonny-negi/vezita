@@ -41,7 +41,7 @@ exports.deletePackage = catchAsyncErrors(async (req, res, next) => {
     package: mongoose.Types.ObjectId(req.params.id),
   });
 
-  if (associatedPackages?.length)
+  if (associatedPackages.length)
     return next(
       new ErrorHandler(
         "You cannot delete this package as it is subscribe by users",

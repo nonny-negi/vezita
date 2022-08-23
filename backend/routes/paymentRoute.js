@@ -12,44 +12,46 @@ const {
   orderDetailsForAdmin,
 } = require("../controllers/paymentController");
 
-const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+
+const {requiresAuth,restrictTo}=require("../middleware/firebaseAuth")
+
 
 const router = express.Router();
 
 router
   .route("/process-payment")
-  .post(isAuthenticatedUser, authorizeRoles("user"), processPayment);
+  .post(requiresAuth,restrictTo('user'), processPayment);
 
 router
   .route("/stripe-api-key")
-  .get(isAuthenticatedUser, authorizeRoles("user"), sendStripeApiKey);
+  .get( sendStripeApiKey);
 
 router
   .route("/create-order")
-  .post(isAuthenticatedUser, authorizeRoles("user"), createOrder);
+  .post(requiresAuth,restrictTo('user'), createOrder);
 
 router
   .route("/my-order")
-  .get(isAuthenticatedUser, authorizeRoles("user"), ordersForUser);
+  .get( ordersForUser);
 
 router
   .route("/docter-order")
-  .get(isAuthenticatedUser, authorizeRoles("docter"), ordersForDoctor);
+  .get( ordersForDoctor);
 
 router
   .route("/single/docter-order/:id")
-  .get(isAuthenticatedUser, authorizeRoles("docter"), orderDetailsForDocter);
+  .get( orderDetailsForDocter);
 
 router
   .route("/single/my-order/:id")
-  .get(isAuthenticatedUser, authorizeRoles("user"), orderDetailsForUser);
+  .get( orderDetailsForUser);
 
 router
   .route("/admin-order")
-  .get(isAuthenticatedUser, authorizeRoles("admin"), orderForAdmin);
+  .get( orderForAdmin);
 
 router
   .route("/single/admin-order/:id")
-  .get(isAuthenticatedUser, authorizeRoles("admin"), orderDetailsForAdmin);
+  .get( orderDetailsForAdmin);
 
 module.exports = router;

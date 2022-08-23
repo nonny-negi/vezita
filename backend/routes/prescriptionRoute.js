@@ -1,37 +1,33 @@
 const prescriptionController = require("../controllers/prescriptionController");
-const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+// const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+
+const {requiresAuth,restrictTo}=require("../middleware/firebaseAuth")
 
 const router = require("express").Router();
 
 router
   .route("/doctor/:docterId/add")
   .post(
-    isAuthenticatedUser,
-    authorizeRoles("docter"),
+    requiresAuth,restrictTo('docter'),
     prescriptionController.addPrescription
   );
 
 router
   .route("/doctor/:docterId/get-all/:patientId")
   .get(
-    isAuthenticatedUser,
-    authorizeRoles("docter"),
+    requiresAuth,restrictTo('docter'),
     prescriptionController.getAllPrescription
   );
 
 router
   .route("/user/:userId/get-all/")
   .get(
-    isAuthenticatedUser,
-    authorizeRoles("user"),
     prescriptionController.getAllPrescriptions
   );
 
 router
   .route("/user/:userId/get-all/:patientId")
   .get(
-    isAuthenticatedUser,
-    authorizeRoles("user"),
     prescriptionController.getOnePrescription
   );
 

@@ -1,5 +1,5 @@
 const analyticsController = require("../controllers/analyticsController");
-const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const {requiresAuth,restrictTo}=require("../middleware/firebaseAuth")
 
 const router = require("express").Router();
 
@@ -7,8 +7,6 @@ const router = require("express").Router();
 router
   .route("/doctor/:docterId/total-accepted")
   .get(
-    isAuthenticatedUser,
-    authorizeRoles("docter"),
     analyticsController.getTotalaccepted
   );
 
@@ -16,8 +14,6 @@ router
 router
   .route("/doctor/:docterId/total-declined")
   .get(
-    isAuthenticatedUser,
-    authorizeRoles("docter"),
     analyticsController.getTotaldeclined
   );
 
@@ -25,8 +21,6 @@ router
 router
   .route("/doctor/:docterId/total-booking")
   .get(
-    isAuthenticatedUser,
-    authorizeRoles("docter"),
     analyticsController.getTotalBookingPerDay
   );
 
@@ -34,8 +28,6 @@ router
 router
   .route("/doctor/:docterId/total-transaction")
   .get(
-    isAuthenticatedUser,
-    authorizeRoles("docter"),
     analyticsController.getTotalTransaction
   );
 

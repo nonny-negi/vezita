@@ -7,6 +7,9 @@
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js"
   },
+  "engines": {
+    "node": "12"
+  },
   "author": "nonny",
   "license": "ISC",
   "dependencies": {
@@ -19,7 +22,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "firebase": "^9.9.1",
-    "firebase-admin": "^11.0.0",
+    "firebase-admin": "^10.3.0",
     "handlebars": "^4.7.7",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.5",

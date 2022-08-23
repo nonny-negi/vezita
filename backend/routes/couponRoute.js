@@ -7,19 +7,19 @@ const {
   getCouponById,
 } = require("../controllers/couponController");
 
-const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const {requiresAuth,restrictTo}=require("../middleware/firebaseAuth")
 
 const router = express.Router();
 
 router
   .route("/new")
-  .post(isAuthenticatedUser, authorizeRoles("admin"), addCoupon);
+  .post(requiresAuth,restrictTo('admin'), addCoupon);
 
 router.route("/").get(getAllCoupons);
 
 router
   .route("/:id")
   .get(getCouponById)
-  .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteCoupon);
+  .delete(requiresAuth,restrictTo('admin'), deleteCoupon);
 
 module.exports = router;
