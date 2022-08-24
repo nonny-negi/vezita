@@ -3,6 +3,7 @@ const { initializeApp } = require("firebase/app");
 const admin = require("firebase-admin");
 const serviceAccount = require("../serviceAccountKey.json");
 require("dotenv").config();
+
 console.log(process.env.FIREBASE_API_KEY);
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY.toString(),

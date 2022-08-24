@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   firebaseSignInProvider: {
     type: String,
-    unique:true
+    required:true
   },
   email: {
     type: String,
